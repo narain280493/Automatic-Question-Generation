@@ -38,6 +38,7 @@ import java.io.*;
 //import java.text.NumberFormat;
 import java.util.*;
 
+import distractorgeneration.DistractorGenerator;
 import edu.stanford.nlp.trees.CollinsHeadFinder;
 //import edu.cmu.ark.ranking.WekaLinearRegressionRanker;
 import edu.stanford.nlp.trees.Tree;
@@ -156,11 +157,29 @@ public class QuestionAsker {
 		}
 		
 		try{
-			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-			
-			if(GlobalProperties.getDebug()) System.err.println("\nInput Text:");
-			String doc;
-
+			while(true){
+				if(GlobalProperties.getDebug()) System.err.println("\nInput TextFile:");
+				String doc;
+	
+				String query = readLine().trim();
+				System.out.println("Query read is :"+query);
+				//Right now input takes only File TODO: Do it for other types of inputstream also
+				if (query.startsWith("FILE: ")||query.startsWith("file: ")) {
+						System.out.println("Yes it is file");
+						// when input is the following format:
+						// FILE: in.txt out.txt
+						// read text from in.txt and output to out.txt
+						String fileLine = query.substring(6).trim();
+						String[] files = fileLine.split("\\s+");
+						if (files.length != 2) {
+							System.out.println("FILE field must only contain two valid files. e.g.:");
+							System.out.println("FILE: input.txt output.txt");
+							continue;
+						}
+			//	processTextFile(files[0],files[1]);
+						FileReader in = new FileReader(files[0]);
+					    BufferedReader br = new BufferedReader(in);	
+				
 			
 			while(true){
 				outputQuestionList.clear();
@@ -225,7 +244,8 @@ public class QuestionAsker {
 				}
 				
 				//now print the questions
-				//double featureValue;
+				
+				String ansPhrase="";
 				for(Question question: outputQuestionList){
 					if(question.getTree().getLeaves().size() > maxLength){
 						continue;
@@ -236,11 +256,12 @@ public class QuestionAsker {
 					System.out.print(question.yield());
 					//if(printVerbose) System.out.print("\t"+AnalysisUtilities.getCleanedUpYield(question.getSourceTree()));
 					Tree ansTree = question.getAnswerPhraseTree();
+					
 					if(printVerbose) System.out.print("\t");
 					if(ansTree != null){
-						String ansPhrase = AnalysisUtilities.getCleanedUpYield(question.getAnswerPhraseTree());
+						ansPhrase = AnalysisUtilities.getCleanedUpYield(question.getAnswerPhraseTree());
 						System.out.println("AnsPhrase= "+ansPhrase);
-						if(ansPhrase.split(" ").length>=2){
+						if (!isAnsPhraseProperNoun(ansPhrase)) {
 							System.out.println("Resolving answerphrase to a single word...");
 							String headWord=resolveHead(ansPhrase);
 							if(headWord!=null){
@@ -248,25 +269,67 @@ public class QuestionAsker {
 							}
 							
 						}
-						//	System.out.print("Answer Phrase tree= "+AnalysisUtilities.getCleanedUpYield(question.getAnswerPhraseTree()));
-							
 					}
+					System.out.println("Answer Phrase :"+ansPhrase);
 					//if(printVerbose) 
 					System.out.print("\t"+question.getScore());
-					//System.err.println("Answer depth: "+question.getFeatureValue("answerDepth"));
+					System.out.println("Answer Sentence(Source document) : "+question.getSourceDocument());
+					System.out.println("Answer Sentence(Source Tree.nodeString) : "+question.getSourceTree().nodeString());
+					System.out.println("Answer Sentence(Source Tree.pennString) : "+question.getSourceTree().pennString());
 					
-					System.out.println();
-				}
-			
-				if(GlobalProperties.getDebug()) System.err.println("Seconds Elapsed Total:\t"+((System.currentTimeMillis()-startTime)/1000.0));
-				//prompt for another piece of input text 
-				if(GlobalProperties.getDebug()) System.err.println("\nInput Text:");
+					
+					//System.err.println("Answer depth: "+question.getFeatureValue("answerDepth"));
+	/*				//our code for distractor generator
+					int distractorCount=0;
+					//System.out.println(" Question :"+question.yield());
+				    //System.out.println(" Answer phrase :"+ansPhrase);
+					System.out.println("Distractor generation starts:");
+					//NOTE: call POS Tagger before SST because POS Tagger will group all adjacent proper noun together
+					//which is then used by SST tagger
+					List<String>posList=DistractorGenerator.getPOSTaggerDistractors(files[0], ansPhrase);
+					
+					List<String>sstList=DistractorGenerator.getSSTTaggerDistractors(files[0], ansPhrase);
+					System.out.println("Ranking POS distractors");
+					DistractorGenerator.rankDistractor(ansSent, ansPhrase, posList);
+					System.out.println("No. of SST Distractors found :"+(sstList.size()-1));
+					//stage 1 SuperSenseTagger
+											   
+					if(sstList.size()>=2){
+						distractorCount+=(sstList.size()-1);
+					    for(int i=1;i<sstList.size();i++){
+				//	    	System.out.println("Distractor :"+sstList.get(i));
+					    }
+					}
+					//Distractor ranking
+					//substitute the answer phrase with the distractor and check the probability of N-gram using
+					//microsoft bing api 
+					
+					
+					//stage 2 POSTagger
+						System.out.println("No. of POS Distractors found :"+(posList.size()-1));
+						distractorCount+=(posList.size()-1);
+					    for(int i=1;i<posList.size();i++){
+					//    	System.out.println("Distractor :"+posList.get(i));
+					    }
+					
+		
+
+		*/		}
+			}//child while block ends
 			}
+		}//parent while block ends
+		//		System.out.println("QA with distractor generation done :-) ");
+		
 			
+
+//					System.out.println();
+				
 			
-			
-			
-		}catch(Exception e){
+		//		if(GlobalProperties.getDebug()) System.err.println("Seconds Elapsed Total:\t"+((System.currentTimeMillis()-startTime)/1000.0));
+				//prompt for another piece of input text 
+	//			if(GlobalProperties.getDebug()) System.err.println("\nInput Text:");
+		}//try block ends
+		catch(Exception e){
 			e.printStackTrace();
 		}
 	}
@@ -385,13 +448,23 @@ public class QuestionAsker {
 	    	
 	    	return true;
 	    }
-		public static boolean isansPhraseProperNoun(String ansPhrase) {
+		public static boolean isAnsPhraseProperNoun(String ansPhrase) {
 			// TODO Auto-generated method stub
 			if(nounPhraseSet.contains(ansPhrase)){
 				return true;
 			}
 			return false;
 		}
+		protected static String readLine() {
+			try {
+				return new java.io.BufferedReader(new
+					java.io.InputStreamReader(System.in)).readLine();
+			}
+			catch(java.io.IOException e) {
+				return new String("");
+			}
+		}
+
 
 	
 }

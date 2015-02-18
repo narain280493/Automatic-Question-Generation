@@ -18,7 +18,7 @@
 	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration (2)/lib/lingpipe.jar"/>
 	<classpathentry kind="lib" path="/home/vishnu/workspace/JSON-jars/json-simple-1.1.1.jar"/>
 	<classpathentry kind="lib" path="/home/vishnu/workspace/JSON-jars/gson-1.0.jar"/>
-	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration (2)/lib/pdfbox-1.8.8.jar"/>
-	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration (2)/lib/fontbox-1.8.5.jar"/>
+	<classpathentry kind="lib" path="/home/vishnu/workspace/pdfbox-jars/pdfbox-1.8.8.jar"/>
+	<classpathentry kind="lib" path="/home/vishnu/workspace/pdfbox-jars/fontbox-1.8.5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
