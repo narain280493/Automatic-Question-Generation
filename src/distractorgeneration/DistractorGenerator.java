@@ -24,7 +24,7 @@ class DistractorComparator implements Comparator<Distractor>{
 }
 public class DistractorGenerator {
  
-   
+public static boolean ngramSwitch=true;
    //@input list of words
    //@output probability of occurrence of that words
 public static List<List<String>> getNgrams(String[] wordList,String distractor,int index,int N){
@@ -210,6 +210,8 @@ public static List<String> getPOSTaggerDistractors (String fileName, String quer
 	      DataInputStream dis;
 	      String s;
 	      
+	      if(list==null)
+	    	  return 0;
 	      String str="";
 	      String urlString = "http://weblm.research.microsoft.com/rest.svc/bing-body/2013-12/3/cp?u=10151e05-1396-417c-bc92-ac6de3cabf96&p=";
 	      for(String word : list){
@@ -225,7 +227,7 @@ public static List<String> getPOSTaggerDistractors (String fileName, String quer
 	          urlString = urlString.substring(0, urlString.length()-1);
 	        }
 	      System.out.println(urlString);
-	      
+	      if(ngramSwitch){
 	      try {
 	 
 	             u = new URL(urlString);
@@ -265,6 +267,8 @@ public static List<String> getPOSTaggerDistractors (String fileName, String quer
 	      Double x = Math.pow(10, logx);
 	      System.out.println("antilog "+x);
 	      return x;
+	      }
+	      return 0;
 	   }  
 	 
   /* public static void main(String[] args) {
