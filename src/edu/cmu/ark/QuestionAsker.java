@@ -66,7 +66,9 @@ import edu.stanford.nlp.trees.tregex.TregexPattern;
  */
 public class QuestionAsker {
 
-
+	public static HashSet<String>nounPhraseSet = new HashSet<String>();
+	public static boolean isNounPhraseSetPopulated = false;
+	
 	public QuestionAsker(){
 		try {
 			StanfordParser.initialize();
@@ -336,5 +338,60 @@ public class QuestionAsker {
 	    }
 	    return wordCount;
 	}
+	//after POS tag merges all proper nouns together, it writes the proper noun list as file
+	//read the file and populate the nounPhrase Set
+	 public static boolean populateNounPhraseSet(){
+	    	if(isNounPhraseSetPopulated==false){
+	    		System.out.println("populating nounPhrase Set");
+	    		BufferedReader in = null;
+	    		try {
+	    			in = new BufferedReader(new FileReader(new File("/home/vishnu/fyp_resources/temp/nounphrases.txt")));
+	    		} catch (FileNotFoundException e) {
+	    			// TODO Auto-generated catch block
+	    			e.printStackTrace();
+	    		}
+	    		String nounPhraseFileText="";
+	    		try {
+	    			while (in.ready()) {
+	    				nounPhraseFileText+= in.readLine().trim();
+	    			}
+
+	    	 		in.close();
+	    		} catch (IOException e) {
+	    			// TODO Auto-generated catch block
+	    			e.printStackTrace();
+	    		}
+
+	    		System.out.println("Text read from nounPhraseFile :"+nounPhraseFileText);
+	    		String[] nounPhraseList=nounPhraseFileText.split("\\|");
+	    		System.out.println("Reading nounphrases");  
+	    		for(String nounPhraseWithStar:nounPhraseList){
+	    			String[] nounWords=nounPhraseWithStar.split("\\*");
+	    			boolean firstTime = true;
+	    		    String nounPhrase = "";
+	    		    for (String word : nounWords) {
+	    		        if (firstTime) {
+	    		            firstTime = false;
+	    		        } else {
+	    		            nounPhrase+=" ";
+	    		        }
+	    		        nounPhrase+=word;
+	    		    }
+	    		    nounPhraseSet.add(nounPhrase);
+	    		    
+	    		}
+	    		  isNounPhraseSetPopulated=true; 
+	    	}
+	    	
+	    	return true;
+	    }
+		public static boolean isansPhraseProperNoun(String ansPhrase) {
+			// TODO Auto-generated method stub
+			if(nounPhraseSet.contains(ansPhrase)){
+				return true;
+			}
+			return false;
+		}
+
 	
 }
