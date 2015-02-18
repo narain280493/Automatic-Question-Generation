@@ -253,33 +253,30 @@ public class QuestionAsker {
 					if(justWH && question.getFeatureValue("whQuestion") != 1.0){
 						continue;
 					}
-					System.out.print(question.yield());
+					System.out.println("Question :"+question.yield());
 					//if(printVerbose) System.out.print("\t"+AnalysisUtilities.getCleanedUpYield(question.getSourceTree()));
 					Tree ansTree = question.getAnswerPhraseTree();
 					
-					if(printVerbose) System.out.print("\t");
+					//if(printVerbose) System.out.print("\t");
 					if(ansTree != null){
 						ansPhrase = AnalysisUtilities.getCleanedUpYield(question.getAnswerPhraseTree());
-						System.out.println("AnsPhrase= "+ansPhrase);
-						if (!isAnsPhraseProperNoun(ansPhrase)) {
+						System.out.println("Answer Phrase detected :"+ansPhrase);
+						if (!isAnsPhraseProperNoun(ansPhrase)&&(countWords(ansPhrase)>=2)) {
 							System.out.println("Resolving answerphrase to a single word...");
 							String headWord=resolveHead(ansPhrase);
 							if(headWord!=null){
 								ansPhrase=headWord;
 							}
-							
 						}
 					}
 					System.out.println("Answer Phrase :"+ansPhrase);
 					//if(printVerbose) 
-					System.out.print("\t"+question.getScore());
-					System.out.println("Answer Sentence(Source document) : "+question.getSourceDocument());
-					System.out.println("Answer Sentence(Source Tree.nodeString) : "+question.getSourceTree().nodeString());
-					System.out.println("Answer Sentence(Source Tree.pennString) : "+question.getSourceTree().pennString());
-					
+					System.out.println("Score :"+question.getScore());
+					String ansSentence = question.getSourceTree().yield().toString();
+					System.out.println("Answer Sentence :"+ansSentence);
 					
 					//System.err.println("Answer depth: "+question.getFeatureValue("answerDepth"));
-	/*				//our code for distractor generator
+				//our code for distractor generator
 					int distractorCount=0;
 					//System.out.println(" Question :"+question.yield());
 				    //System.out.println(" Answer phrase :"+ansPhrase);
@@ -290,7 +287,7 @@ public class QuestionAsker {
 					
 					List<String>sstList=DistractorGenerator.getSSTTaggerDistractors(files[0], ansPhrase);
 					System.out.println("Ranking POS distractors");
-					DistractorGenerator.rankDistractor(ansSent, ansPhrase, posList);
+					DistractorGenerator.rankDistractor(ansSentence, ansPhrase, posList);
 					System.out.println("No. of SST Distractors found :"+(sstList.size()-1));
 					//stage 1 SuperSenseTagger
 											   
@@ -314,7 +311,7 @@ public class QuestionAsker {
 					
 		
 
-		*/		}
+			}
 			}//child while block ends
 			}
 		}//parent while block ends

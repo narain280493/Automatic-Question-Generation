@@ -11,14 +11,14 @@
 	<classpathentry kind="lib" path="lib/weka-3-6.jar"/>
 	<classpathentry kind="lib" path="question-generation.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration (2)/lib/stanford-parser.jar"/>
-	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration (2)/lib/log4j.jar"/>
-	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration (2)/lib/javelin.jar"/>
-	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration (2)/lib/apache-logging-log4j.jar.zip"/>
-	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration (2)/lib/lingpipe.jar"/>
 	<classpathentry kind="lib" path="/home/vishnu/workspace/JSON-jars/json-simple-1.1.1.jar"/>
 	<classpathentry kind="lib" path="/home/vishnu/workspace/JSON-jars/gson-1.0.jar"/>
 	<classpathentry kind="lib" path="/home/vishnu/workspace/pdfbox-jars/pdfbox-1.8.8.jar"/>
 	<classpathentry kind="lib" path="/home/vishnu/workspace/pdfbox-jars/fontbox-1.8.5.jar"/>
+	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration/lib/stanford-parser.jar"/>
+	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration/lib/log4j.jar"/>
+	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration/lib/lingpipe.jar"/>
+	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration/lib/javelin.jar"/>
+	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration/lib/apache-logging-log4j.jar.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
