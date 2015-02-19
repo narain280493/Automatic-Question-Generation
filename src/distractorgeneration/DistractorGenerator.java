@@ -16,9 +16,9 @@ import java.util.List;
 class DistractorComparator implements Comparator<Distractor>{
 	public int compare(Distractor o1, Distractor o2) {
 		if(o1.weight > o2.weight){
-            return 1;
-        } else {
             return -1;
+        } else {
+            return 1;
         }
 	}
 }
@@ -77,10 +77,28 @@ public static void rankDistractor(String sentence,String ans,List<String> distra
 	for(String distractor:distractors){
 		List<List<String>> ngramList=getNgrams(wordList, distractor, index, N);
 		double probabilitySum=0;
-		for(List<String> ngram:ngramList){
-			probabilitySum+=getProbability(ngram);
+		//instead of checking all ngrams check only the first ngram alone to reduce the number of requests for
+		//ngram bing api
+		List<String> ngram=new ArrayList<String>();
+		for(List<String> ngram1:ngramList){
+			if(ngram1.size()>=2){
+				ngram=ngram1;
+				break;
+			}
 		}
-		distractorList.add(new Distractor(distractor,probabilitySum/ngramList.size()));
+		probabilitySum=getProbability(ngram); 
+		if(ngramList.size()>=2){
+			for(int i=ngramList.size()-1;i>=0;i--){
+				if(ngramList.get(i).size()>=2){
+					ngram=ngramList.get(i);
+					break;
+				}
+			}
+		probabilitySum+=getProbability(ngram);
+		probabilitySum/=new Double(2);
+		}
+		
+		distractorList.add(new Distractor(distractor,probabilitySum));
 	}
    Collections.sort(distractorList,new DistractorComparator());
    System.out.println("Distractor Ranking :");
@@ -210,8 +228,10 @@ public static List<String> getPOSTaggerDistractors (String fileName, String quer
 	      DataInputStream dis;
 	      String s;
 	      
-	      if(list==null)
+	      if(list==null||list.size()==0){
+	    	 System.out.println("Got empty list");
 	    	  return 0;
+	      }
 	      String str="";
 	      String urlString = "http://weblm.research.microsoft.com/rest.svc/bing-body/2013-12/3/cp?u=10151e05-1396-417c-bc92-ac6de3cabf96&p=";
 	      for(String word : list){
@@ -226,7 +246,12 @@ public static List<String> getPOSTaggerDistractors (String fileName, String quer
 	      if (urlString.length() > 0 && urlString.charAt(urlString.length()-1)=='+') {
 	          urlString = urlString.substring(0, urlString.length()-1);
 	        }
-	      System.out.println(urlString);
+	    /*  System.out.println("List of words in ngram");
+	      for(String word : list){
+	  	    System.out.print(word+"\t");
+	      }
+	  	  System.out.println();
+	      *///System.out.println(urlString);
 	      if(ngramSwitch){
 	      try {
 	 
@@ -265,7 +290,7 @@ public static List<String> getPOSTaggerDistractors (String fileName, String quer
 	      Double logx=Double.valueOf(str);
 	      //finding antilog for given log value
 	      Double x = Math.pow(10, logx);
-	      System.out.println("antilog "+x);
+	      //System.out.println("antilog "+x);
 	      return x;
 	      }
 	      return 0;
