@@ -38,6 +38,7 @@ import java.io.*;
 //import java.text.NumberFormat;
 import java.util.*;
 
+import ComprehensionQuestionGeneration.VocabularyQuestion;
 import distractorgeneration.DistractorGenerator;
 import edu.stanford.nlp.trees.CollinsHeadFinder;
 //import edu.cmu.ark.ranking.WekaLinearRegressionRanker;
@@ -69,6 +70,7 @@ public class QuestionAsker {
 
 	public static HashSet<String>nounPhraseSet = new HashSet<String>();
 	public static boolean isNounPhraseSetPopulated = false;
+	public static String fileName;
 	
 	public QuestionAsker(){
 		try {
@@ -165,7 +167,6 @@ public class QuestionAsker {
 				System.out.println("Query read is :"+query);
 				//Right now input takes only File TODO: Do it for other types of inputstream also
 				if (query.startsWith("FILE: ")||query.startsWith("file: ")) {
-						System.out.println("Yes it is file");
 						// when input is the following format:
 						// FILE: in.txt out.txt
 						// read text from in.txt and output to out.txt
@@ -176,7 +177,7 @@ public class QuestionAsker {
 							System.out.println("FILE: input.txt output.txt");
 							continue;
 						}
-			//	processTextFile(files[0],files[1]);
+						fileName=files[0];
 						FileReader in = new FileReader(files[0]);
 					    BufferedReader br = new BufferedReader(in);	
 				
@@ -286,8 +287,8 @@ public class QuestionAsker {
 					List<String>posList=DistractorGenerator.getPOSTaggerDistractors(files[0], ansPhrase);
 					
 					List<String>sstList=DistractorGenerator.getSSTTaggerDistractors(files[0], ansPhrase);
-					System.out.println("Ranking POS distractors");
-					DistractorGenerator.rankDistractor(ansSentence, ansPhrase, posList);
+					System.out.println("Ranking SST distractors");
+					DistractorGenerator.rankDistractor(ansSentence, ansPhrase, sstList);
 					System.out.println("No. of SST Distractors found :"+(sstList.size()-1));
 					//stage 1 SuperSenseTagger
 											   
@@ -314,17 +315,9 @@ public class QuestionAsker {
 			}
 			}//child while block ends
 			}
-		}//parent while block ends
-		//		System.out.println("QA with distractor generation done :-) ");
-		
-			
 
-//					System.out.println();
-				
-			
-		//		if(GlobalProperties.getDebug()) System.err.println("Seconds Elapsed Total:\t"+((System.currentTimeMillis()-startTime)/1000.0));
-				//prompt for another piece of input text 
-	//			if(GlobalProperties.getDebug()) System.err.println("\nInput Text:");
+				VocabularyQuestion.populateTagMap();
+			}//parent while block ends
 		}//try block ends
 		catch(Exception e){
 			e.printStackTrace();

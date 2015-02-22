@@ -119,7 +119,7 @@ public static List<String> getPOSTaggerDistractors (String fileName, String quer
       String str="";
       String urlString="";
 	try {
-		urlString = "http://localhost:8080/hitMe?queryString="+URLEncoder.encode(queryString,"UTF-8")+"&&fileName="+URLEncoder.encode(fileName,"UTF-8");
+		urlString = "http://localhost:8080/hitMe?queryString="+URLEncoder.encode(queryString,"UTF-8")+"&&type=1&&fileName="+URLEncoder.encode(fileName,"UTF-8");
 	} catch (UnsupportedEncodingException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
