@@ -94,7 +94,9 @@ public class VocabularyQuestion {
 		System.out.println("Words considered as vocabularies");
 		
 		for(String tag:posTags){
-			List<String> list=getWordsFromPOSTag(QuestionAsker.fileName, tag);
+			//@param 1 - fileName Note: when you are testing hardcode the filename here.When this gets integrated in 
+			//QuestionGeneration mention QuestionAsker.fileName
+			List<String> list=getWordsFromPOSTag("input.txt", tag);
 			
 			System.out.println("Tag :"+tag);
 			if(list.size()==1&&list.get(0).equals("-1")){
@@ -109,6 +111,9 @@ public class VocabularyQuestion {
 		}
 		
 		
+	}
+	public static void main(String[] args) {
+		populateTagMap();
 	}
 
 }
