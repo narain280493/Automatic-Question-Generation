@@ -10,15 +10,18 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
+import Utility.ThesaurusAPI;
 import edu.cmu.ark.QuestionAsker;
 
 public class VocabularyQuestion {
 	//Using POS tagging remove articles,nouns,pronouns
-	public static final Map<String,List<String> > TAG_MAPS = new HashMap<String,List<String>>();
+	public static final Map<String,List<String> > TAG_MAP = new HashMap<String,List<String>>();
 	
 	public static List<String> getWordsFromPOSTag (String fileName, String queryString) {
 		 
@@ -106,14 +109,59 @@ public class VocabularyQuestion {
 				for(String word:list){
 					System.out.println(word);
 				}
-				TAG_MAPS.put(tag, list);
+				TAG_MAP.put(tag, list);
 			}
 		}
 		
 		
 	}
+	public static int randInt(int min, int max) {
+
+	    // NOTE: Usually this should be a field rather than a method
+	    // variable so that it is not re-seeded every call.
+	    Random rand = new Random();
+
+	    // nextInt is normally exclusive of the top value,
+	    // so add 1 to make it inclusive
+	    int randomNum = rand.nextInt((max - min) + 1) + min;
+
+	    return randomNum;
+	}
+	public static void generateMatchTheSynonymQuestion(){
+		String[] posTags = {"JJ","JJR","JJS","VB","VBG","VBZ","RB","RBR","RBS"};
+		Set<String> selectedWords=new HashSet<String>();
+		int count=0;
+		int tagNum;
+		int wordNum;
+		while(selectedWords.size()<=5){
+			tagNum=randInt(0,posTags.length-1);
+			if(TAG_MAP.containsKey(posTags[tagNum])){
+				List<String> words=TAG_MAP.get(posTags[tagNum]);
+				wordNum=randInt(0, words.size()-1);
+				selectedWords.add(words.get(wordNum));
+			}
+			
+		}
+		System.out.println("Match the following using set :"+selectedWords);
+		for(String str:selectedWords){
+			System.out.print(str +" - ");
+			List<String> synonyms=ThesaurusAPI.getSynonyms(str);
+			if(synonyms!=null){
+				for(int i=0;i<synonyms.size();i++){
+					System.out.print(synonyms.get(i));
+					if(i!=synonyms.size()-1)
+						System.out.print(",");
+				}
+				System.out.println();
+			}
+			else{
+				System.out.println("Unable to generate synonyms for :"+str);
+			}
+		}
+	}
 	public static void main(String[] args) {
 		populateTagMap();
+		generateMatchTheSynonymQuestion();
 	}
 
 }
