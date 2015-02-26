@@ -39,6 +39,7 @@ import java.io.*;
 import java.util.*;
 
 import ComprehensionQuestionGeneration.VocabularyQuestion;
+import Configuration.Configuration;
 import distractorgeneration.DistractorGenerator;
 import edu.stanford.nlp.trees.CollinsHeadFinder;
 //import edu.cmu.ark.ranking.WekaLinearRegressionRanker;
@@ -316,7 +317,7 @@ public class QuestionAsker {
 			}//child while block ends
 			}
 
-				VocabularyQuestion.populateTagMap();
+			//	VocabularyQuestion.populateTagMap();
 			}//parent while block ends
 		}//try block ends
 		catch(Exception e){
@@ -398,7 +399,7 @@ public class QuestionAsker {
 	    		System.out.println("populating nounPhrase Set");
 	    		BufferedReader in = null;
 	    		try {
-	    			in = new BufferedReader(new FileReader(new File("/home/vishnu/fyp_resources/temp/nounphrases.txt")));
+	    			in = new BufferedReader(new FileReader(new File(Configuration.NOUN_PHRASES_FILE_PATH)));
 	    		} catch (FileNotFoundException e) {
 	    			// TODO Auto-generated catch block
 	    			e.printStackTrace();
