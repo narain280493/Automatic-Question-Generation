@@ -285,9 +285,9 @@ public class QuestionAsker {
 					System.out.println("Distractor generation starts:");
 					//NOTE: call POS Tagger before SST because POS Tagger will group all adjacent proper noun together
 					//which is then used by SST tagger
-					List<String>posList=DistractorGenerator.getPOSTaggerDistractors(files[0], ansPhrase);
+					List<String>posList=DistractorGenerator.getPOSTaggerDistractors(Configuration.INPUT_FILE_PATH+files[0], ansPhrase);
 					
-					List<String>sstList=DistractorGenerator.getSSTTaggerDistractors(files[0], ansPhrase);
+					List<String>sstList=DistractorGenerator.getSSTTaggerDistractors(Configuration.INPUT_FILE_PATH+files[0], ansPhrase);
 					System.out.println("Ranking SST distractors");
 					DistractorGenerator.rankDistractor(ansSentence, ansPhrase, sstList);
 					System.out.println("No. of SST Distractors found :"+(sstList.size()-1));
