@@ -208,7 +208,8 @@ public class QuestionAsker {
 				if(doc.length() == 0){
 					break;
 				}
-				
+				Configuration.INPUT_TEXT=doc;
+				System.out.println("Saving input text in Configuration.INPUT_TEXT variable");
 				long startTime = System.currentTimeMillis();
 				List<String> sentences = AnalysisUtilities.getSentences(doc);
 				

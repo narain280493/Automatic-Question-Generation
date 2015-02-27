@@ -7,6 +7,10 @@ package ComprehensionQuestionGeneration;
 import java.io.*;
 import java.util.*;
 import java.*;
+
+import Configuration.Configuration;
+import TopicExtraction.Topic;
+import TopicExtraction.WikipediaMinerAPI;
 /**
  *
  * @author aditya
@@ -15,38 +19,18 @@ public class AnagramQuestion
 {
 	public static void main (String args[]) 
         {		
-		Scanner in=new Scanner(System.in);
-		//Read a string from the user
-		System.out.print("Input:"); 
-		String s = in.nextLine();
-		//We convert the string to an array of characters. Basically
-		//we want to freely change the letters in the string, and this
-		//is not possible with class String, and is too cumbersome
-		//with class StringBuffer.
-		char[] text = new char[s.length()]; 
-		for (int i=0; i<s.length(); i++) text[i] = s.charAt(i);			
-		System.out.println("Anagram of " + s);
-		anagramMaker(text, s.length());
+		 	anagramMaker();
 		
 	}
-        static void anagramMaker(char[] a,int len)
-        {
+        static String getAnagram(String a){
+        	int len=a.length();
             Random rand=new Random();
             int j=0;
             int[] num=new int[len];
             boolean[] b=new boolean[len]; 
             char[] anagram = new char[len];
-            for (int i=0; i<len; i++)
-            {
-                num[i] =0;
-                b[i]=false;
-                if(Character.isUpperCase(a[i]))
-                {
-                    a[i]=Character.toLowerCase(a[i]);
-                    //System.out.print(a);
-                }
-            }
-            //Random Sequnce
+            
+            //Random Sequence
             while(j!=len)
             {
                 int randomInt = rand.nextInt(len);
@@ -59,14 +43,47 @@ public class AnagramQuestion
             }
             //Creating anagram according to random sequence
             for (int i=0; i<len; i++) 
-                anagram[i]=a[num[i]];
-            //System.out.println("");
-            printArray(anagram);
-                
+                anagram[i]=a.charAt(num[i]);
+            
+            return String.valueOf(anagram);   
+
+        }
+
+    	public static int randInt(int min, int max) {
+
+    	    // NOTE: Usually this should be a field rather than a method
+    	    // variable so that it is not re-seeded every call.
+    	    Random rand = new Random();
+
+    	    // nextInt is normally exclusive of the top value,
+    	    // so add 1 to make it inclusive
+    	    int randomNum = rand.nextInt((max - min) + 1) + min;
+
+    	    return randomNum;
+    	}
+		static void anagramMaker()
+        {	
+			if(Configuration.INPUT_TEXT==null){
+				System.out.println("Input text is null.Enter input text");
+				Scanner in=new Scanner(System.in);
+				//Read a string from the user
+				System.out.print("Input:"); 
+				Configuration.INPUT_TEXT = in.nextLine();
+				
+			}
+			
+			List<Topic> topicList=WikipediaMinerAPI.getTopics(Configuration.INPUT_TEXT);
+			int i=0;
+			System.out.println();
+			System.err.println("Rearrange the letters to find important keywords from the passage");
+			System.out.println();
+			for(int j=0;j<topicList.size()&&i<5;j++,i++){
+				Topic topic=topicList.get(j);
+				System.out.println(getAnagram(topic.topicName));
+				System.out.println("Answer :"+topic.topicName);
+			}
+			
         }
         
-        static void printArray(char [] a) {
-		for (int i=0; i< a.length; i++) System.out.print(a[i]); 
-		System.out.println();
-	} 
+	 
 }
