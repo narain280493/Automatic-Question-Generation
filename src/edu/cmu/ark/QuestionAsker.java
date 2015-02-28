@@ -71,7 +71,8 @@ public class QuestionAsker {
 
 	public static HashSet<String>nounPhraseSet = new HashSet<String>();
 	public static boolean isNounPhraseSetPopulated = false;
-	public static String fileName;
+	public static String INPUT_FILE_NAME;
+	public static QuestionRanker qr = null;
 	
 	public QuestionAsker(){
 		try {
@@ -84,8 +85,117 @@ public class QuestionAsker {
 	}
 	
 	
+	public static void generateDistractor(String fileName,String answerPhrase,String answerSentence){
+		//our code for distractor generator
+		int distractorCount=0;
+		System.out.println("Distractor generation starts:");
+		//NOTE: call POS Tagger before SST because POS Tagger will group all adjacent proper noun together
+		//which is then used by SST tagger
+		List<String>posList=DistractorGenerator.getPOSTaggerDistractors(Configuration.INPUT_FILE_PATH+INPUT_FILE_NAME, answerPhrase);
+		
+		List<String>sstList=DistractorGenerator.getSSTTaggerDistractors(Configuration.INPUT_FILE_PATH+INPUT_FILE_NAME, answerPhrase);
+		System.out.println("No. of SST Distractors found :"+(sstList.size()-1));
+		//stage 1 SuperSenseTagger
+								   
+		if(sstList.size()>=2){
+			distractorCount+=(sstList.size()-1);
+		    
+		}
+		//Distractor ranking
+		//substitute the answer phrase with the distractor and check the probability of N-gram using
+		//microsoft bing api 
+		
+		
+		//stage 2 POSTagger
+			System.out.println("No. of POS Distractors found :"+(posList.size()-1));
+			distractorCount+=(posList.size()-1);
+		    for(int i=1;i<posList.size();i++){
+		//    	System.out.println("Distractor :"+posList.get(i));
+		    }
+		System.out.println("Ranking SST distractors");
+		DistractorGenerator.rankDistractor(answerSentence, answerPhrase, sstList);
+	}
+	public static  void getQuestionsForSentence(String sentence){
+		List<Tree> inputTrees = new ArrayList<Tree>();
+		Tree parsed;
+		InitialTransformationStep trans = new InitialTransformationStep();
+		QuestionTransducer qt = new QuestionTransducer();
+		boolean preferWH = false;
+		Integer maxLength = 1000;
+		boolean downweightPronouns = false;
+		boolean avoidFreqWords = false;
+		boolean justWH = false;
+		
+		
+		List<Question> outputQuestionList = new ArrayList<Question>();
+		
+		
+		parsed = AnalysisUtilities.getInstance().parseSentence(sentence).parse;
+		inputTrees.add(parsed);
+		
+		
+		//step 1 transformations
+		List<Question> transformationOutput = trans.transform(inputTrees);
+		
+		//step 2 question transducer
+		for(Question t: transformationOutput){
+			if(GlobalProperties.getDebug()) System.err.println("Stage 2 Input: "+t.getIntermediateTree().yield().toString());
+			qt.generateQuestionsFromParse(t);
+			outputQuestionList.addAll(qt.getQuestions());
+		}			
+		
+		//remove duplicates
+		QuestionTransducer.removeDuplicateQuestions(outputQuestionList);
+		
+		//step 3 ranking
+		if(qr != null){
+			qr.scoreGivenQuestions(outputQuestionList);
+			boolean doStemming = true;
+			QuestionRanker.adjustScores(outputQuestionList, inputTrees, avoidFreqWords, preferWH, downweightPronouns, doStemming);
+			QuestionRanker.sortQuestions(outputQuestionList, false);
+		}
+		
+		//now print the questions
+		
+		String ansPhrase="";
+		for(Question question: outputQuestionList){
+			
+			if(question.getTree().getLeaves().size() > maxLength){
+				continue;
+			}
+			if(justWH && question.getFeatureValue("whQuestion") != 1.0){
+				continue;
+			}
+			System.out.println("Question :"+question.yield());
+			Tree ansTree = question.getAnswerPhraseTree();
+			if(ansTree != null){
+				ansPhrase = AnalysisUtilities.getCleanedUpYield(question.getAnswerPhraseTree());
+				System.out.println("Answer Phrase detected :"+ansPhrase);
+				if (!isAnsPhraseProperNoun(ansPhrase)&&(countWords(ansPhrase)>=2)) {
+					System.out.println("Resolving answerphrase to a single word...");
+					String headWord=null;
+					try {
+						headWord = resolveHead(ansPhrase);
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					if(headWord!=null){
+						ansPhrase=headWord;
+					}
+				}
+			}
+			System.out.println("Answer Phrase :"+ansPhrase);
+			//if(printVerbose) 
+			System.out.println("Score :"+question.getScore());
+			String ansSentence = question.getSourceTree().yield().toString();
+			System.out.println("Answer Sentence :"+ansSentence);
+			generateDistractor(INPUT_FILE_NAME, ansPhrase, ansSentence);
+		}
+
+
 	
-	
+	}
 	/**
 	 * @param args
 	 * @throws ParseException 
@@ -95,7 +205,6 @@ public class QuestionAsker {
 		
 		QuestionTransducer qt = new QuestionTransducer();
 		InitialTransformationStep trans = new InitialTransformationStep();
-		QuestionRanker qr = null;
 		
 		
 		qt.setAvoidPronounsAndDemonstratives(false);
@@ -178,7 +287,7 @@ public class QuestionAsker {
 							System.out.println("FILE: input.txt output.txt");
 							continue;
 						}
-						fileName=files[0];
+						INPUT_FILE_NAME=files[0];
 						FileReader in = new FileReader(files[0]);
 					    BufferedReader br = new BufferedReader(in);	
 				
@@ -279,42 +388,9 @@ public class QuestionAsker {
 					System.out.println("Answer Sentence :"+ansSentence);
 					
 					//System.err.println("Answer depth: "+question.getFeatureValue("answerDepth"));
-				//our code for distractor generator
-					int distractorCount=0;
-					//System.out.println(" Question :"+question.yield());
-				    //System.out.println(" Answer phrase :"+ansPhrase);
-					System.out.println("Distractor generation starts:");
-					//NOTE: call POS Tagger before SST because POS Tagger will group all adjacent proper noun together
-					//which is then used by SST tagger
-					List<String>posList=DistractorGenerator.getPOSTaggerDistractors(Configuration.INPUT_FILE_PATH+files[0], ansPhrase);
-					
-					List<String>sstList=DistractorGenerator.getSSTTaggerDistractors(Configuration.INPUT_FILE_PATH+files[0], ansPhrase);
-					System.out.println("Ranking SST distractors");
-					DistractorGenerator.rankDistractor(ansSentence, ansPhrase, sstList);
-					System.out.println("No. of SST Distractors found :"+(sstList.size()-1));
-					//stage 1 SuperSenseTagger
-											   
-					if(sstList.size()>=2){
-						distractorCount+=(sstList.size()-1);
-					    for(int i=1;i<sstList.size();i++){
-				//	    	System.out.println("Distractor :"+sstList.get(i));
-					    }
-					}
-					//Distractor ranking
-					//substitute the answer phrase with the distractor and check the probability of N-gram using
-					//microsoft bing api 
-					
-					
-					//stage 2 POSTagger
-						System.out.println("No. of POS Distractors found :"+(posList.size()-1));
-						distractorCount+=(posList.size()-1);
-					    for(int i=1;i<posList.size();i++){
-					//    	System.out.println("Distractor :"+posList.get(i));
-					    }
-					
-		
 
-			}
+					generateDistractor(INPUT_FILE_NAME, ansPhrase, ansSentence);
+				}
 			}//child while block ends
 			}
 

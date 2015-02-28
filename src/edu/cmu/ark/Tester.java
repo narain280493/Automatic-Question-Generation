@@ -6,7 +6,7 @@ public class Tester {
 	 public static void main(String[] args) throws ParseException{
 
 		 QuestionAsker qa = new QuestionAsker();
-		 qa.resolveHead("old lady's bag");
+		 System.out.println(qa.resolveHead("The Qayen earthquake"));
 	 
 	 }
 }
