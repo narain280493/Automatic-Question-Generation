@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import Configuration.Configuration;
 import Utility.ThesaurusAPI;
 import edu.cmu.ark.QuestionAsker;
 
@@ -99,7 +100,7 @@ public class VocabularyQuestion {
 		for(String tag:posTags){
 			//@param 1 - fileName Note: when you are testing hardcode the filename here.When this gets integrated in 
 			//QuestionGeneration mention QuestionAsker.fileName
-			List<String> list=getWordsFromPOSTag("input.txt", tag);
+			List<String> list=getWordsFromPOSTag(Configuration.INPUT_FILE_PATH, tag);
 			
 			System.out.println("Tag :"+tag);
 			if(list.size()==1&&list.get(0).equals("-1")){
@@ -133,16 +134,20 @@ public class VocabularyQuestion {
 		int count=0;
 		int tagNum;
 		int wordNum;
-		while(selectedWords.size()<=5){
+		while(count<5){
 			tagNum=randInt(0,posTags.length-1);
 			if(TAG_MAP.containsKey(posTags[tagNum])){
 				List<String> words=TAG_MAP.get(posTags[tagNum]);
 				wordNum=randInt(0, words.size()-1);
-				selectedWords.add(words.get(wordNum));
+				if(!selectedWords.contains(words.get(wordNum))){
+					System.out.println("Word : "+words.get(wordNum)+" Tag : "+posTags[tagNum]);
+					selectedWords.add(words.get(wordNum));
+				}
 			}
 			
 		}
-		System.out.println("Match the following using set :"+selectedWords);
+		
+	/*	System.out.println("Match the following using set :"+selectedWords);
 		for(String str:selectedWords){
 			System.out.print(str +" - ");
 			List<String> synonyms=ThesaurusAPI.getSynonyms(str);
@@ -158,6 +163,8 @@ public class VocabularyQuestion {
 				System.out.println("Unable to generate synonyms for :"+str);
 			}
 		}
+	
+	*/
 	}
 	public static void main(String[] args) {
 		populateTagMap();
