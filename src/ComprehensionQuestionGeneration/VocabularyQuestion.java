@@ -20,6 +20,7 @@ import java.util.Set;
 import Configuration.Configuration;
 import Utility.ThesaurusAPI;
 import Utility.VocabularyRanker;
+import Utility.WordNetPythonAPI;
 import edu.cmu.ark.QuestionAsker;
 
 public class VocabularyQuestion {
@@ -82,6 +83,62 @@ public class VocabularyQuestion {
 	   
 	      return list;
 	   }
+	public static String getSSTForGivenWord (String fileName, String queryString) {
+		 
+	    
+	      URL u;
+	      InputStream is = null;
+	      DataInputStream dis;
+	      String s;
+	      
+	      String str="";
+	      String urlString="";
+		try {
+			urlString = "http://localhost:8081/hitMe?queryString="+URLEncoder.encode(queryString,"UTF-8")+"&&type=2&&fileName="+URLEncoder.encode(fileName,"UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	      
+	      
+	      try {
+	 
+	             u = new URL(urlString);
+	               is = u.openStream();         // throws an IOException
+	 
+	       
+	         dis = new DataInputStream(new BufferedInputStream(is));
+	               while ((s = dis.readLine()) != null) {
+	                    str+=s;
+	         }
+	               
+	 
+	      } catch (MalformedURLException mue) {
+	 
+	         System.out.println("Ouch - a MalformedURLException happened.");
+	         mue.printStackTrace();
+	         System.exit(1);
+	 
+	      } catch (IOException ioe) {
+	 
+	         System.out.println("Oops- an IOException happened.");
+	         ioe.printStackTrace();
+	         System.exit(1);
+	 
+	      } finally {
+	 
+	       
+	         try {
+	            is.close();
+	         } catch (IOException ioe) {
+	            // just going to ignore this one
+	         }
+	 
+	      } // end of 'finally' clause
+	      
+	      return str;
+	   }
+	
 	public static void populateTagMap(String inputFilePath){
 		//The following tags are considered for selecting vocabularies
 		/*
@@ -166,10 +223,37 @@ public class VocabularyQuestion {
 		}
 		return rankedVocabularyList;
 	}
-	public static void generateMatchTheSynonymQuestion(){
+	
+	public static void generateMatchTheSynonymQuestion(String inputFilePath){
 		List<String> vocabularyList=getVocabularies();
 		List<String> rankedVocabularyList=rankVocabularies(vocabularyList);
+		List<String> selectedVocabularyList=new ArrayList<String>();
+		List<List<String>> selectedVocabularySynonymList=new ArrayList<List<String>>();
 		int count=0;
+		//System.out.println("WORD AND SST Tag");
+		System.out.println("FINAL LIST");
+		for(String word:rankedVocabularyList){
+			String SSTTag=getSSTForGivenWord(inputFilePath, word);
+			if(SSTTag.equals("0")||SSTTag.equals("WORD_NOT_FOUND_IN_WORD_MAP")){
+				continue;
+			}
+			else{
+				List<String> synonyms=WordNetPythonAPI.getSynonym(2, word, SSTTag);
+				System.out.println("SYNONYM :");
+				for(String syn:synonyms){
+					System.out.println(syn);
+				}
+				
+				selectedVocabularySynonymList.add(synonyms);
+				count++;
+			}
+			if(count==4)
+				break;
+		}
+		for(int i=0;i<selectedVocabularyList.size();i++){
+			System.out.println("WORD "+selectedVocabularyList.get(i));
+			System.out.println("SYNONYMS "+selectedVocabularySynonymList.get(i).get(0));
+		}
 		
 	}
 		
@@ -194,7 +278,7 @@ public class VocabularyQuestion {
 	
 	public static void main(String[] args) {
 		populateTagMap("/home/vishnu/workspace/QuestionGeneration/earthquake.txt");
-		generateMatchTheSynonymQuestion();
+		generateMatchTheSynonymQuestion("/home/vishnu/workspace/QuestionGeneration/earthquake.txt");
 	}
 
 }
