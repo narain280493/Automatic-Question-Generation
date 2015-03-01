@@ -8,6 +8,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,6 +19,7 @@ import java.util.Set;
 
 import Configuration.Configuration;
 import Utility.ThesaurusAPI;
+import Utility.VocabularyRanker;
 import edu.cmu.ark.QuestionAsker;
 
 public class VocabularyQuestion {
@@ -80,7 +82,7 @@ public class VocabularyQuestion {
 	   
 	      return list;
 	   }
-	public static void populateTagMap(){
+	public static void populateTagMap(String inputFilePath){
 		//The following tags are considered for selecting vocabularies
 		/*
 		JJ	Adjective
@@ -100,7 +102,7 @@ public class VocabularyQuestion {
 		for(String tag:posTags){
 			//@param 1 - fileName Note: when you are testing hardcode the filename here.When this gets integrated in 
 			//QuestionGeneration mention QuestionAsker.fileName
-			List<String> list=getWordsFromPOSTag(Configuration.INPUT_FILE_PATH, tag);
+			List<String> list=getWordsFromPOSTag(inputFilePath, tag);
 			
 			System.out.println("Tag :"+tag);
 			if(list.size()==1&&list.get(0).equals("-1")){
@@ -128,10 +130,20 @@ public class VocabularyQuestion {
 
 	    return randomNum;
 	}
-	public static void generateMatchTheSynonymQuestion(){
-		String[] posTags = {"JJ","JJR","JJS","VB","VBG","VBZ","RB","RBR","RBS"};
+	public static  List<String> getVocabularies(){
+		String[] posTags = {"JJ","JJR","JJS","VB","VBG","VBZ"};
 		Set<String> selectedWords=new HashSet<String>();
-		int count=0;
+		List<String> vocabularyList=new ArrayList<String>();
+		for(String tag:posTags){
+		
+			if(TAG_MAP.containsKey(tag)){
+				
+				selectedWords.addAll(TAG_MAP.get(tag));
+			}
+		}
+		vocabularyList.addAll(selectedWords);
+		return vocabularyList;
+		/*	int count=0;
 		int tagNum;
 		int wordNum;
 		while(count<5){
@@ -144,8 +156,22 @@ public class VocabularyQuestion {
 					selectedWords.add(words.get(wordNum));
 				}
 			}
-			
+	*/
+	}
+	public static List<String> rankVocabularies(List<String> vocabularyList){
+		List<String> rankedVocabularyList=VocabularyRanker.getRankedlist(vocabularyList);
+		System.out.println("Rankedlist");
+		for(String word:rankedVocabularyList){
+			System.out.println(word);
 		}
+		return rankedVocabularyList;
+	}
+	public static void generateMatchTheSynonymQuestion(){
+		List<String> vocabularyList=getVocabularies();
+		List<String> rankedVocabularyList=rankVocabularies(vocabularyList);
+		int count=0;
+		
+	}
 		
 	/*	System.out.println("Match the following using set :"+selectedWords);
 		for(String str:selectedWords){
@@ -165,9 +191,9 @@ public class VocabularyQuestion {
 		}
 	
 	*/
-	}
+	
 	public static void main(String[] args) {
-		populateTagMap();
+		populateTagMap("/home/vishnu/workspace/QuestionGeneration/earthquake.txt");
 		generateMatchTheSynonymQuestion();
 	}
 

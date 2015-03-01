@@ -31,9 +31,6 @@ package edu.cmu.ark;
 ///import info.ephyra.nlp.StanfordParser;
 //import info.ephyra.nlp.TreeUtil;
 
-
-
-
 import java.io.*;
 //import java.text.NumberFormat;
 import java.util.*;
@@ -91,6 +88,8 @@ public class QuestionAsker {
 		System.out.println("Distractor generation starts:");
 		//NOTE: call POS Tagger before SST because POS Tagger will group all adjacent proper noun together
 		//which is then used by SST tagger
+		List<String>posDistractorList= new ArrayList<String>();
+		List<String>sstDistractorList= new ArrayList<String>();
 		List<String>posList=DistractorGenerator.getPOSTaggerDistractors(Configuration.INPUT_FILE_PATH+INPUT_FILE_NAME, answerPhrase);
 		
 		List<String>sstList=DistractorGenerator.getSSTTaggerDistractors(Configuration.INPUT_FILE_PATH+INPUT_FILE_NAME, answerPhrase);
@@ -113,7 +112,12 @@ public class QuestionAsker {
 		//    	System.out.println("Distractor :"+posList.get(i));
 		    }
 		System.out.println("Ranking SST distractors");
-		DistractorGenerator.rankDistractor(answerSentence, answerPhrase, sstList);
+		posDistractorList.addAll(posList);
+		sstDistractorList.addAll(sstList);
+		//remove "yes" or "no" which is the first element in the sst and pos list 
+		posDistractorList.remove(0);
+		sstDistractorList.remove(0);
+		DistractorGenerator.rankDistractor(answerSentence, answerPhrase, sstDistractorList);
 	}
 	public static  void getQuestionsForSentence(String sentence){
 		List<Tree> inputTrees = new ArrayList<Tree>();
