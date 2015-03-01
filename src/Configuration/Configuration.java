@@ -6,5 +6,6 @@ public class Configuration {
 	//Used in QuestionAsker
 	public static String NOUN_PHRASES_FILE_PATH="/home/vishnu/fyp_resources/temp/nounphrases.txt";
 	public static String INPUT_TEXT;
+	public static String TRANSCRIPT_JSON_FILE_PATH="/home/vishnu/workspace/QuestionGeneration/transcript.json";
 
 }
