@@ -14,6 +14,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import Configuration.Configuration;
+
 public class TranscriptCrawler {
 	public static Map<String,String> TRANSCRIPT_MAP=new HashMap<String,String>();
 
@@ -27,20 +29,20 @@ public class TranscriptCrawler {
 			e.printStackTrace();
 		}
 		Elements timeDataTags=doc.select("data[class=talk-transcript__para__time]");
-		//JSONArray jsonArray=new JSONArray();
-		JSONObject obj=new JSONObject();
+		JSONArray jsonArray=new JSONArray();
 		for(Element timeDataTag:timeDataTags){
 			//System.out.println(timeDataTag.text()+" "+timeDataTag.nextElementSibling().text());
 			String text=timeDataTag.nextElementSibling().text();
-			
+			JSONObject obj=new JSONObject();
 			obj.put(timeDataTag.text(), text);
+			jsonArray.add(obj);
 			transcript+=(text+" ");
 			
 		}
-		System.out.println("JSON :"+obj.toJSONString());
+		System.out.println("JSON :"+jsonArray.toJSONString());
 		try {
 			 
-			File file = new File("/home/vishnu/workspace/QuestionGeneration/transcript.json");
+			File file = new File(Configuration.TRANSCRIPT_JSON_FILE_PATH);
  
 			// if file doesnt exists, then create it
 			if (!file.exists()) {
@@ -49,7 +51,7 @@ public class TranscriptCrawler {
  
 			FileWriter fw = new FileWriter(file.getAbsoluteFile());
 			BufferedWriter bw = new BufferedWriter(fw);
-			bw.write(obj.toJSONString());
+			bw.write(jsonArray.toJSONString());
 			bw.close();
  
 			//System.out.println("Done");
@@ -63,8 +65,13 @@ public class TranscriptCrawler {
 		
 	}
 	
+
 	public static void main(String[] args) {
 		getTranscript("http://www.ted.com/talks/russell_foster_why_do_we_sleep/transcript?language=en");
+		VideoClipper vc=new VideoClipper();
+		vc.ClipVideo();
+		VideoPlayer vp =new VideoPlayer();
+		vp.play();
 	}
 	
 
