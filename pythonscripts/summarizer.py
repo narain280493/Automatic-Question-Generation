@@ -189,17 +189,15 @@ def main():
 
     st = SummaryTool()
 
-    #filepath = """/home/narain/Documents/inputs/KatherineHepburn.txt"""
-    #ccontent = st.readFile(filepath)
-    fo = open("/home/vishnu/workspace/QuestionGeneration/transcript.txt","r")
-
+    filepath = """/home/vishnu/workspace/QuestionGeneration/transcript.txt"""
+    content = st.readFile(filepath)
+    fo = open("fee.txt","wb")
    # print content
     complete_summary = [] 
 
     para_summary = [] 
 
-    content = fo.read()
-    #Building the sentence dictionary
+     #Building the sentence dictionary
     sentences_dic = st.get_senteces_ranks(content)
     
    

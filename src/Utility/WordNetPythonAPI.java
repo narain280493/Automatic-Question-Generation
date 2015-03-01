@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -90,16 +91,13 @@ public class WordNetPythonAPI {
 			}
 			
 			
+			
 		} catch (IOException e) {
 			
 			e.printStackTrace();
 		}
 
 		
-		
-		
-		
-	    
 		return list;
 		
 	}
@@ -121,11 +119,13 @@ public class WordNetPythonAPI {
 			e.printStackTrace();
 		}
 		
-		
+		synonyms=removeDuplicates(synonyms,word);
 		
 		return synonyms;
 		
 	}
+	
+	
 	public static List<String> getAntonyms(int choice, String word, String tag)
 	{
 		List<String> antonyms = new ArrayList();
@@ -143,8 +143,17 @@ public class WordNetPythonAPI {
 			
 			e.printStackTrace();
 		}
+		antonyms=removeDuplicates(antonyms,word);
 		return antonyms;
 		
+	}
+	public static List<String> removeDuplicates(List<String> words,String word)
+	{
+
+		words = new ArrayList<String>(new HashSet<String>(words));
+		words.remove(word);
+		return words;
+	
 	}
 	
 }

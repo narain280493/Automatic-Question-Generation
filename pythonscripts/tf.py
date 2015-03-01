@@ -27,11 +27,15 @@ def freq(word, content):
   return content.count(word)
 
 def tf(word, content):
+<<<<<<< HEAD
   wordCountValue = float(wordCount(content))
   if(wordCountValue!=0):
   	return (freq(word,content) /wordCountValue )
   else:
   	return 0
+=======
+  return (freq(word,content) / float(wordCount(content)))
+>>>>>>> b6ba2e293062fd29398034a6e540c619b4c16e7b
 
 def main():
 
