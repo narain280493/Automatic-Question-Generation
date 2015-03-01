@@ -12,13 +12,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import Configuration.Configuration;
+
 
 public class WordNetPythonAPI {
 
 	public static void main(String[] args) {
 		String word="good";
 		String tag ="adj.all";
-		int choice = 3;
+		int choice = 2;
 		switch(choice)
 		{
 		case 1: List<String> list= new ArrayList<String>();
@@ -76,7 +78,7 @@ public class WordNetPythonAPI {
 	{
 		List <String> list= new ArrayList<String>();
 	    try {
-			Process p = Runtime.getRuntime().exec("python /home/vishnu/workspace/QuestionGeneration/pythonscripts syn.py "+choice+" "+word+" "+tag);
+			Process p = Runtime.getRuntime().exec(Configuration.WORDNET_PYTHON_SCRIPT+" "+choice+" "+word+" "+tag);
 			int counter =0;
 			String line;
 			
@@ -106,7 +108,7 @@ public class WordNetPythonAPI {
 		List<String> synonyms = new ArrayList();
 		String line =new String();
 		try {
-			Process p = Runtime.getRuntime().exec("python syn.py "+choice+" "+word+" "+tag);
+			Process p = Runtime.getRuntime().exec(Configuration.WORDNET_PYTHON_SCRIPT+" "+choice+" "+word+" "+tag);
 			BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			
 			while ((line = in.readLine()) != null)
@@ -129,7 +131,7 @@ public class WordNetPythonAPI {
 		List<String> antonyms = new ArrayList();
 		String line =new String();
 		try {
-			Process p = Runtime.getRuntime().exec("python syn.py "+choice+" "+word+" "+tag);
+			Process p = Runtime.getRuntime().exec(Configuration.WORDNET_PYTHON_SCRIPT+" "+choice+" "+word+" "+tag);
 			BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			
 			while ((line = in.readLine()) != null)
