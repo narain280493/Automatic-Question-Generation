@@ -2,6 +2,7 @@ package distractorgeneration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,6 +32,13 @@ public class DistractorFilter {
 		return removedList;
 	}
 	
+	public static List<String> removeSSTDistractorsFromPOSDistractorList(List<String> posDistractorList,List<String> sstDistractorList){
+		for(String word:sstDistractorList){
+			posDistractorList.remove(word);
+		}
+		return posDistractorList;
+		
+	}
 	public static void main(String[] args) {
 		List<String> list=new ArrayList<String>();
 		list.add("member");

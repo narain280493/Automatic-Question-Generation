@@ -112,17 +112,40 @@ public class QuestionAsker {
 		
 		//stage 2 POSTagger
 			System.out.println("No. of POS Distractors found :"+(posList.size()-1));
-			distractorCount+=(posList.size()-1);
-		    for(int i=1;i<posList.size();i++){
+		//	distractorCount+=(posList.size()-1);
+		  //  for(int i=1;i<posList.size();i++){
 		//    	System.out.println("Distractor :"+posList.get(i));
-		    }
+		    //}
+		 
 		posDistractorList.addAll(posList);
 		sstDistractorList.addAll(sstList);
 		//remove "yes" or "no" which is the first element in the sst and pos list 
 		posDistractorList.remove(0);
 		sstDistractorList.remove(0);
+		if(isAnsPhraseProperNoun(answerPhrase)){
+			System.out.println("SST distractors: ");
+			for(String word:sstDistractorList){
+				System.out.println(word);
+			}
+		}
+		else{
 		System.out.println("Ranking SST distractors");
 		DistractorGenerator.rankDistractor(answerSentence, answerPhrase, sstDistractorList);
+		}
+		if(distractorCount<3){
+			 posDistractorList=DistractorFilter.removeSSTDistractorsFromPOSDistractorList(posDistractorList,sstDistractorList);
+			 posDistractorList=DistractorFilter.removeAnswerPhraseWordsFromDistractorList(originalAnsPhrase, posDistractorList);
+			 if(isAnsPhraseProperNoun(answerPhrase)){
+					System.out.println("POS distractors: ");
+					for(String word:posDistractorList){
+						System.out.println(word);
+					}
+			}
+			else{
+			 System.out.println("Ranking POS distractors");
+			 DistractorGenerator.rankDistractor(answerSentence, answerPhrase, posDistractorList);
+			}
+		 }
 	}
 	public static  void getQuestionsForSentence(String sentence){
 		List<Tree> inputTrees = new ArrayList<Tree>();
@@ -166,10 +189,10 @@ public class QuestionAsker {
 		
 		//now print the questions
 		
-		String ansPhrase="";
-		String originalAnsPhrase="";
 		for(Question question: outputQuestionList){
-			
+			String ansPhrase="";
+			String originalAnsPhrase="";
+				
 			if(question.getTree().getLeaves().size() > maxLength){
 				continue;
 			}
@@ -177,6 +200,7 @@ public class QuestionAsker {
 				continue;
 			}
 			System.out.println("Question :"+question.yield());
+			System.out.println("Score :"+question.getScore());
 			Tree ansTree = question.getAnswerPhraseTree();
 			if(ansTree != null){
 				ansPhrase = AnalysisUtilities.getCleanedUpYield(question.getAnswerPhraseTree());
@@ -194,13 +218,21 @@ public class QuestionAsker {
 						ansPhrase=headWord;
 					}
 				}
+				System.out.println("Answer Phrase :"+ansPhrase);
+				String ansSentence = question.getSourceTree().yield().toString();
+				System.out.println("Answer Sentence :"+ansSentence);
+				generateDistractor(INPUT_FILE_NAME, originalAnsPhrase, ansPhrase, ansSentence);
+				
 			}
-			System.out.println("Answer Phrase :"+ansPhrase);
+			else{
+		
+				System.out.println("VISHNU yes/no");
+				String ansSentence = question.getSourceTree().yield().toString();
+				System.out.println("Answer Sentence :"+ansSentence);
+				
+			}
+			//System.out.println("Question type : "+question.);
 			//if(printVerbose) 
-			System.out.println("Score :"+question.getScore());
-			String ansSentence = question.getSourceTree().yield().toString();
-			System.out.println("Answer Sentence :"+ansSentence);
-			generateDistractor(INPUT_FILE_NAME, originalAnsPhrase, ansPhrase, ansSentence);
 			
 		}
 
@@ -368,10 +400,11 @@ public class QuestionAsker {
 				
 				//now print the questions
 				
-				String ansPhrase="";
-				String originalAnsPhrase="";
 				int questionCount=1;
 				for(Question question: outputQuestionList){
+					String ansPhrase="";
+					String originalAnsPhrase="";
+						
 					if(question.getTree().getLeaves().size() > maxLength){
 						continue;
 					}
@@ -379,37 +412,49 @@ public class QuestionAsker {
 						continue;
 					}
 					System.out.println();
-					System.out.println("====================================================================================================");
+					System.out.println("=====================================================================================================");
 					System.out.println();
-					System.out.println("Question number: "+questionCount);
+					System.out.println("QuestionCount: "+questionCount);
 					questionCount++;
 					System.out.println("Question :"+question.yield());
-					//if(printVerbose) System.out.print("\t"+AnalysisUtilities.getCleanedUpYield(question.getSourceTree()));
+					System.out.println("Score :"+question.getScore());
 					Tree ansTree = question.getAnswerPhraseTree();
-					
-					//if(printVerbose) System.out.print("\t");
 					if(ansTree != null){
 						ansPhrase = AnalysisUtilities.getCleanedUpYield(question.getAnswerPhraseTree());
-						originalAnsPhrase = ansPhrase;
 						System.out.println("Answer Phrase detected :"+ansPhrase);
 						if (!isAnsPhraseProperNoun(ansPhrase)&&(countWords(ansPhrase)>=2)) {
 							System.out.println("Resolving answerphrase to a single word...");
-							String headWord=resolveHead(ansPhrase);
+							String headWord=null;
+							try {
+								headWord = resolveHead(ansPhrase);
+							} catch (ParseException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 							if(headWord!=null){
 								ansPhrase=headWord;
 							}
 						}
+						System.out.println("Answer Phrase :"+ansPhrase);
+						String ansSentence = question.getSourceTree().yield().toString();
+						System.out.println("Answer Sentence :"+ansSentence);
+						generateDistractor(INPUT_FILE_NAME, originalAnsPhrase, ansPhrase, ansSentence);
+						
 					}
-					System.out.println("Answer Phrase :"+ansPhrase);
+					else{
+				
+						//System.out.println("VISHNU yes/no");
+						System.out.println("Answer Phrase :"+"Yes");
+						
+						String ansSentence = question.getSourceTree().yield().toString();
+						System.out.println("Answer Sentence :"+ansSentence);
+						
+					}
+					//System.out.println("Question type : "+question.);
 					//if(printVerbose) 
-					System.out.println("Score :"+question.getScore());
-					String ansSentence = question.getSourceTree().yield().toString();
-					System.out.println("Answer Sentence :"+ansSentence);
 					
-					//System.err.println("Answer depth: "+question.getFeatureValue("answerDepth"));
-
-					generateDistractor(INPUT_FILE_NAME, originalAnsPhrase, ansPhrase, ansSentence);
 				}
+	
 			}//child while block ends
 			}
 
