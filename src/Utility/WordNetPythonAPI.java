@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import edu.cmu.ark.PorterStemmer;
 import Configuration.Configuration;
 
 
@@ -149,9 +150,11 @@ public class WordNetPythonAPI {
 	}
 	public static List<String> removeDuplicates(List<String> words,String word)
 	{
-
+		String rootWord=PorterStemmer.getInstance().stem(word);
 		words = new ArrayList<String>(new HashSet<String>(words));
 		words.remove(word);
+		if(words.contains(rootWord))
+			words.remove(rootWord);
 		return words;
 	
 	}

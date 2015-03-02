@@ -37,6 +37,7 @@ import java.util.*;
 
 import ComprehensionQuestionGeneration.VocabularyQuestion;
 import Configuration.Configuration;
+import distractorgeneration.DistractorFilter;
 import distractorgeneration.DistractorGenerator;
 import edu.stanford.nlp.trees.CollinsHeadFinder;
 //import edu.cmu.ark.ranking.WekaLinearRegressionRanker;
@@ -82,7 +83,7 @@ public class QuestionAsker {
 	}
 	
 	
-	public static void generateDistractor(String fileName,String answerPhrase,String answerSentence){
+	public static void generateDistractor(String fileName,String originalAnsPhrase,String answerPhrase,String answerSentence){
 		//our code for distractor generator
 		int distractorCount=0;
 		System.out.println("Distractor generation starts:");
@@ -91,8 +92,12 @@ public class QuestionAsker {
 		List<String>posDistractorList= new ArrayList<String>();
 		List<String>sstDistractorList= new ArrayList<String>();
 		List<String>posList=DistractorGenerator.getPOSTaggerDistractors(Configuration.INPUT_FILE_PATH+INPUT_FILE_NAME, answerPhrase);
-		
+		//NOTE: Call populateNounPhraseSet function only after POSTagger
+		//System.out.println("VISHNU calling :"+populateNounPhraseSet());
+		populateNounPhraseSet();
 		List<String>sstList=DistractorGenerator.getSSTTaggerDistractors(Configuration.INPUT_FILE_PATH+INPUT_FILE_NAME, answerPhrase);
+		sstList=DistractorFilter.removeAnswerPhraseWordsFromDistractorList(originalAnsPhrase, sstList);
+		
 		System.out.println("No. of SST Distractors found :"+(sstList.size()-1));
 		//stage 1 SuperSenseTagger
 								   
@@ -111,12 +116,12 @@ public class QuestionAsker {
 		    for(int i=1;i<posList.size();i++){
 		//    	System.out.println("Distractor :"+posList.get(i));
 		    }
-		System.out.println("Ranking SST distractors");
 		posDistractorList.addAll(posList);
 		sstDistractorList.addAll(sstList);
 		//remove "yes" or "no" which is the first element in the sst and pos list 
 		posDistractorList.remove(0);
 		sstDistractorList.remove(0);
+		System.out.println("Ranking SST distractors");
 		DistractorGenerator.rankDistractor(answerSentence, answerPhrase, sstDistractorList);
 	}
 	public static  void getQuestionsForSentence(String sentence){
@@ -162,6 +167,7 @@ public class QuestionAsker {
 		//now print the questions
 		
 		String ansPhrase="";
+		String originalAnsPhrase="";
 		for(Question question: outputQuestionList){
 			
 			if(question.getTree().getLeaves().size() > maxLength){
@@ -194,7 +200,8 @@ public class QuestionAsker {
 			System.out.println("Score :"+question.getScore());
 			String ansSentence = question.getSourceTree().yield().toString();
 			System.out.println("Answer Sentence :"+ansSentence);
-			generateDistractor(INPUT_FILE_NAME, ansPhrase, ansSentence);
+			generateDistractor(INPUT_FILE_NAME, originalAnsPhrase, ansPhrase, ansSentence);
+			
 		}
 
 
@@ -330,20 +337,20 @@ public class QuestionAsker {
 				List<Tree> inputTrees = new ArrayList<Tree>();
 				
 				for(String sentence: sentences){
-					if(GlobalProperties.getDebug()) System.err.println("Question Asker: sentence: "+sentence);
+					//if(GlobalProperties.getDebug()) System.err.println("Question Asker: sentence: "+sentence);
 					
 					parsed = AnalysisUtilities.getInstance().parseSentence(sentence).parse;
 					inputTrees.add(parsed);
 				}
 				
-				if(GlobalProperties.getDebug()) System.err.println("Seconds Elapsed Parsing:\t"+((System.currentTimeMillis()-startTime)/1000.0));
+			//	if(GlobalProperties.getDebug()) System.err.println("Seconds Elapsed Parsing:\t"+((System.currentTimeMillis()-startTime)/1000.0));
 				
 				//step 1 transformations
 				List<Question> transformationOutput = trans.transform(inputTrees);
 				
 				//step 2 question transducer
 				for(Question t: transformationOutput){
-					if(GlobalProperties.getDebug()) System.err.println("Stage 2 Input: "+t.getIntermediateTree().yield().toString());
+				//	if(GlobalProperties.getDebug()) System.err.println("Stage 2 Input: "+t.getIntermediateTree().yield().toString());
 					qt.generateQuestionsFromParse(t);
 					outputQuestionList.addAll(qt.getQuestions());
 				}			
@@ -362,6 +369,8 @@ public class QuestionAsker {
 				//now print the questions
 				
 				String ansPhrase="";
+				String originalAnsPhrase="";
+				int questionCount=1;
 				for(Question question: outputQuestionList){
 					if(question.getTree().getLeaves().size() > maxLength){
 						continue;
@@ -369,6 +378,11 @@ public class QuestionAsker {
 					if(justWH && question.getFeatureValue("whQuestion") != 1.0){
 						continue;
 					}
+					System.out.println();
+					System.out.println("====================================================================================================");
+					System.out.println();
+					System.out.println("Question number: "+questionCount);
+					questionCount++;
 					System.out.println("Question :"+question.yield());
 					//if(printVerbose) System.out.print("\t"+AnalysisUtilities.getCleanedUpYield(question.getSourceTree()));
 					Tree ansTree = question.getAnswerPhraseTree();
@@ -376,6 +390,7 @@ public class QuestionAsker {
 					//if(printVerbose) System.out.print("\t");
 					if(ansTree != null){
 						ansPhrase = AnalysisUtilities.getCleanedUpYield(question.getAnswerPhraseTree());
+						originalAnsPhrase = ansPhrase;
 						System.out.println("Answer Phrase detected :"+ansPhrase);
 						if (!isAnsPhraseProperNoun(ansPhrase)&&(countWords(ansPhrase)>=2)) {
 							System.out.println("Resolving answerphrase to a single word...");
@@ -393,7 +408,7 @@ public class QuestionAsker {
 					
 					//System.err.println("Answer depth: "+question.getFeatureValue("answerDepth"));
 
-					generateDistractor(INPUT_FILE_NAME, ansPhrase, ansSentence);
+					generateDistractor(INPUT_FILE_NAME, originalAnsPhrase, ansPhrase, ansSentence);
 				}
 			}//child while block ends
 			}
@@ -476,6 +491,7 @@ public class QuestionAsker {
 	//after POS tag merges all proper nouns together, it writes the proper noun list as file
 	//read the file and populate the nounPhrase Set
 	 public static boolean populateNounPhraseSet(){
+		 //System.out.println("VISHNU is in: populateNounPhraseSet()");
 	    	if(isNounPhraseSetPopulated==false){
 	    		System.out.println("populating nounPhrase Set");
 	    		BufferedReader in = null;

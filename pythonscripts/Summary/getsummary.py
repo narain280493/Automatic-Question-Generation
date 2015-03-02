@@ -8,7 +8,7 @@ paragraph = []
 content = " "
 count =0
 
-with open("/home/narain/workspace/questiongeneration/transcript.json") as json_file:
+with open("/home/vishnu/workspace/QuestionGeneration/transcript.json") as json_file:
     json_data = json.load(json_file)
    
 for item in json_data:

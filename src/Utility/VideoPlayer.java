@@ -14,7 +14,7 @@ public class VideoPlayer {
 			HtmlWriter hw= new HtmlWriter();
 			hw.writeHtml();
 		
-			String htmlFilePath = "/home/narain/workspace/video.html";
+			String htmlFilePath = "/home/vishnu/workspace/video.html";
 			File htmlFile = new File(htmlFilePath);
 	        Desktop.getDesktop().browse(htmlFile.toURI());
 	        

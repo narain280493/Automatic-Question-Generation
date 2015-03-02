@@ -9,7 +9,7 @@ public class VideoClipper {
 	{
 		
 		try {
-			Process p = Runtime.getRuntime().exec("python /home/narain/workspace/questiongeneration/pythonscripts/Summary/getsummary.py ");
+			Process p = Runtime.getRuntime().exec("python /home/vishnu/workspace/QuestionGeneration/pythonscripts/Summary/getsummary.py ");
 			BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			String line = new String();
 			while ((line = in.readLine()) != null)

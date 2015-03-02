@@ -9,8 +9,8 @@ def clip(start_time, end_time):
 	sub = end_time.split(":")
 	end_time_min = sub[0]
 	end_time_sec = sub[1]
-	result = VideoFileClip("/home/narain/fyp_resources/Video/ted_video.mp4").subclip(t_start =(int(start_time_min),int(start_time_sec)), t_end= (int(end_time_min),int(end_time_sec)))
-	result.write_videofile("/home/narain/fyp_resources/Video/ted_cut.mp4",fps=25) # Many options...
+	result = VideoFileClip("/home/vishnu/fyp_resources/Video/ted_video.mp4").subclip(t_start =(int(start_time_min),int(start_time_sec)), t_end= (int(end_time_min),int(end_time_sec)))
+	result.write_videofile("/home/vishnu/fyp_resources/Video/ted_cut.mp4",fps=25) # Many options...
             
 
 

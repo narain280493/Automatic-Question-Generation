@@ -2,6 +2,7 @@
 from __future__ import division
 import re
 import socket  
+import sys
 import random
 from tf import *
 
@@ -189,9 +190,9 @@ def main():
 
     st = SummaryTool()
 
-    filepath = """/home/vishnu/workspace/QuestionGeneration/transcript.txt"""
+    filepath = sys.argv[1]
     content = st.readFile(filepath)
-    fo = open("fee.txt","wb")
+    fo = open("summarizer_output.txt","wb")
    # print content
     complete_summary = [] 
 
@@ -236,9 +237,11 @@ def main():
             question = st.generate_questions(2)
             #st.question_printer(question)
             fo.write("Q:")
+            
             fo.write(question)
             fo.write("\n")
             for sentence in p:
+                
                 fo.write(sentence)
                 fo.write("\n ---------- \n")
         fo.close()
@@ -250,7 +253,9 @@ def main():
         print "One paragraph \n"
         complete_summary = st.get_distractors(content,sentences_dic,1)
         question = st.generate_questions(1)
-        st.question_printer(question)
+        fo.write("Q:")
+        fo.write(question)
+        fo.write("\n")
         for sentence in complete_summary:
             fo.write(sentence)
             fo.write("\n ---------- \n")
