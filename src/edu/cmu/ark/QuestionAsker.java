@@ -37,6 +37,7 @@ import java.util.*;
 
 import ComprehensionQuestionGeneration.VocabularyQuestion;
 import Configuration.Configuration;
+import distractorgeneration.Distractor;
 import distractorgeneration.DistractorFilter;
 import distractorgeneration.DistractorGenerator;
 import edu.stanford.nlp.trees.CollinsHeadFinder;
@@ -91,9 +92,9 @@ public class QuestionAsker {
 		//which is then used by SST tagger
 		List<String>posDistractorList= new ArrayList<String>();
 		List<String>sstDistractorList= new ArrayList<String>();
+		List<Distractor> selectedDistractors = new ArrayList<Distractor>();
 		List<String>posList=DistractorGenerator.getPOSTaggerDistractors(Configuration.INPUT_FILE_PATH+INPUT_FILE_NAME, answerPhrase);
 		//NOTE: Call populateNounPhraseSet function only after POSTagger
-		//System.out.println("VISHNU calling :"+populateNounPhraseSet());
 		populateNounPhraseSet();
 		List<String>sstList=DistractorGenerator.getSSTTaggerDistractors(Configuration.INPUT_FILE_PATH+INPUT_FILE_NAME, answerPhrase);
 		sstList=DistractorFilter.removeAnswerPhraseWordsFromDistractorList(originalAnsPhrase, sstList);
@@ -111,11 +112,8 @@ public class QuestionAsker {
 		
 		
 		//stage 2 POSTagger
-			System.out.println("No. of POS Distractors found :"+(posList.size()-1));
-		//	distractorCount+=(posList.size()-1);
-		  //  for(int i=1;i<posList.size();i++){
-		//    	System.out.println("Distractor :"+posList.get(i));
-		    //}
+		System.out.println("No. of POS Distractors found :"+(posList.size()-1));
+
 		 
 		posDistractorList.addAll(posList);
 		sstDistractorList.addAll(sstList);
@@ -125,12 +123,22 @@ public class QuestionAsker {
 		if(isAnsPhraseProperNoun(answerPhrase)){
 			System.out.println("SST distractors: ");
 			for(String word:sstDistractorList){
+				selectedDistractors.add(new Distractor(word, 1));
 				System.out.println(word);
 			}
+			
 		}
 		else{
 		System.out.println("Ranking SST distractors");
-		DistractorGenerator.rankDistractor(answerSentence, answerPhrase, sstDistractorList);
+		List<Distractor> selectedSSTDistractors=DistractorGenerator.rankDistractor(answerSentence, answerPhrase, sstDistractorList);
+		 if(selectedSSTDistractors!=null){
+			 for(Distractor distractor:selectedSSTDistractors){
+				 System.out.println(distractor.distractorWord+" "+distractor.weight);
+				 selectedDistractors.add(distractor);
+			 }
+			 
+		 }
+		
 		}
 		if(distractorCount<3){
 			 posDistractorList=DistractorFilter.removeSSTDistractorsFromPOSDistractorList(posDistractorList,sstDistractorList);
@@ -138,14 +146,42 @@ public class QuestionAsker {
 			 if(isAnsPhraseProperNoun(answerPhrase)){
 					System.out.println("POS distractors: ");
 					for(String word:posDistractorList){
+						selectedDistractors.add(new Distractor(word, 1));
 						System.out.println(word);
 					}
 			}
 			else{
 			 System.out.println("Ranking POS distractors");
-			 DistractorGenerator.rankDistractor(answerSentence, answerPhrase, posDistractorList);
+			 List<Distractor> selectedPOSDistractors=DistractorGenerator.rankDistractor(answerSentence, answerPhrase, posDistractorList);
+			 if(selectedPOSDistractors!=null){
+				 for(Distractor distractor:selectedPOSDistractors){
+					 System.out.println(distractor.distractorWord+" "+distractor.weight);
+					 selectedDistractors.add(distractor);
+				 }
+			 }
 			}
 		 }
+		List<String> multipleChoices=new ArrayList<String>();
+		int i=1;
+		for(Distractor distractor:selectedDistractors){
+			if(i==3)
+				break;
+			multipleChoices.add(distractor.distractorWord);
+			i++;
+		}
+		multipleChoices.add(answerPhrase);
+		if(multipleChoices.size()>=3){
+		Collections.shuffle(multipleChoices);
+		System.out.println("****************************************************************************************");
+		System.out.println("Multiple choices:");
+		int choiceNumber=1;
+		for(String choice:multipleChoices){
+			System.out.print(choiceNumber+++")"+choice+"\t");
+		}
+		System.out.println();
+		System.out.println("****************************************************************************************");
+		}
+		
 	}
 	public static  void getQuestionsForSentence(String sentence){
 		List<Tree> inputTrees = new ArrayList<Tree>();
@@ -226,7 +262,7 @@ public class QuestionAsker {
 			}
 			else{
 		
-				System.out.println("VISHNU yes/no");
+			//	System.out.println("VISHNU yes/no");
 				String ansSentence = question.getSourceTree().yield().toString();
 				System.out.println("Answer Sentence :"+ansSentence);
 				
