@@ -67,12 +67,11 @@ public class TranscriptCrawler {
 	
 
 	public static void main(String[] args) {
-		getTranscript("http://www.ted.com/talks/russell_foster_why_do_we_sleep/transcript?language=en");
+	//	getTranscript("http://www.ted.com/talks/russell_foster_why_do_we_sleep/transcript?language=en");
 		VideoClipper vc=new VideoClipper();
 		vc.ClipVideo();
 		VideoPlayer vp =new VideoPlayer();
 		vp.play();
 	}
 	
-
 }

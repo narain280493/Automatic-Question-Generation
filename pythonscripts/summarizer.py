@@ -254,6 +254,8 @@ def main():
         question = st.generate_questions(1)
         st.question_printer(question)
         for sentence in complete_summary:
+             fo.write("Q:")
+            fo.write(question)
             fo.write(sentence)
             fo.write("\n ---------- \n")
         fo.close()
