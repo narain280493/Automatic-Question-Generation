@@ -35,7 +35,7 @@ public class SummarizerQuestion {
 			}catch(Exception e){ System.out.println("Exception:"+e);}
 	}
 	public static void main(String[] args) {
-		generateSummarizerQuestion("/home/vishnu/workspace/QuestionGeneration/input3.txt");
+		generateSummarizerQuestion("/home/vishnu/workspace/QuestionGeneration/bullying.txt");
 	}
 
 }

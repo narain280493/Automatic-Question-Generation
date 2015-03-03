@@ -13,21 +13,20 @@ public class DistractorFilter {
 	public static Set<String> answerPhraseWordSet=new HashSet<String>();
 	public static List<String> removeAnswerPhraseWordsFromDistractorList(String answerPhrase,List<String> distractorList){
 		List<String> removedList=new ArrayList<String>();
+		//converting allwords in answerPhrase to lowercase
+		answerPhrase=answerPhrase.toLowerCase();
 		answerPhrase = answerPhrase.replaceAll("[!?,]", "");
 		String[] strs = answerPhrase.split("\\s+");
 		answerPhraseWordSet=new HashSet<String>(Arrays.asList(strs));
 		//also remove the stemmed word of the answerPhrase
 		String rootWord=PorterStemmer.getInstance().stem(answerPhrase);
-		answerPhraseWordSet.remove(rootWord);
-		
-		for(String word:distractorList){
-			if(answerPhraseWordSet.contains(word)){
-			//	System.out.println("REMOVING word: "+word);
-				continue;
-			}
-			else
-				removedList.add(word);
+		answerPhraseWordSet.add(rootWord.toLowerCase());
+		//changing all distractors to lowercase words
+		for(int i=0;i<distractorList.size();i++){
+			distractorList.set(i,distractorList.get(i).toLowerCase());
 		}
+		removedList.addAll(distractorList);
+		removedList.removeAll(answerPhraseWordSet);
 		
 		return removedList;
 	}
@@ -42,7 +41,7 @@ public class DistractorFilter {
 	public static void main(String[] args) {
 		List<String> list=new ArrayList<String>();
 		list.add("member");
-		list.add("carpenter");
+		list.add("Carpenter");
 		list=removeAnswerPhraseWordsFromDistractorList("an excellent farmer and carpenter", list);
 		System.out.println("After removing:");
 		for(String word:list)
