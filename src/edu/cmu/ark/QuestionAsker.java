@@ -85,7 +85,6 @@ public class QuestionAsker {
 	
 	
 	public static void generateDistractor(String fileName,String originalAnsPhrase,String answerPhrase,String answerSentence){
-		//our code for distractor generator
 		int distractorCount=0;
 		System.out.println("Distractor generation starts:");
 		//NOTE: call POS Tagger before SST because POS Tagger will group all adjacent proper noun together
@@ -96,19 +95,13 @@ public class QuestionAsker {
 		List<String>posList=DistractorGenerator.getPOSTaggerDistractors(Configuration.INPUT_FILE_PATH+INPUT_FILE_NAME, answerPhrase);
 		//NOTE: Call populateNounPhraseSet function only after POSTagger
 		populateNounPhraseSet();
+		//stage 1 SuperSenseTagger
 		List<String>sstList=DistractorGenerator.getSSTTaggerDistractors(Configuration.INPUT_FILE_PATH+INPUT_FILE_NAME, answerPhrase);
 		sstList=DistractorFilter.removeAnswerPhraseWordsFromDistractorList(originalAnsPhrase, sstList);
-		
 		System.out.println("No. of SST Distractors found :"+(sstList.size()-1));
-		//stage 1 SuperSenseTagger
-								   
 		if(sstList.size()>=2){
 			distractorCount+=(sstList.size()-1);
-		    
 		}
-		//Distractor ranking
-		//substitute the answer phrase with the distractor and check the probability of N-gram using
-		//microsoft bing api 
 		
 		
 		//stage 2 POSTagger
@@ -120,6 +113,10 @@ public class QuestionAsker {
 		//remove "yes" or "no" which is the first element in the sst and pos list 
 		posDistractorList.remove(0);
 		sstDistractorList.remove(0);
+		//Distractor ranking
+		//substitute the answer phrase with the distractor and check the probability of N-gram using
+		//microsoft bing api 
+				
 		if(isAnsPhraseProperNoun(answerPhrase)){
 			System.out.println("SST distractors: ");
 			for(String word:sstDistractorList){
@@ -129,20 +126,20 @@ public class QuestionAsker {
 			
 		}
 		else{
-		System.out.println("Ranking SST distractors");
-		List<Distractor> selectedSSTDistractors=DistractorGenerator.rankDistractor(answerSentence, answerPhrase, sstDistractorList);
-		 if(selectedSSTDistractors!=null){
-			 for(Distractor distractor:selectedSSTDistractors){
-				 System.out.println(distractor.distractorWord+" "+distractor.weight);
-				 selectedDistractors.add(distractor);
-			 }
+			System.out.println("Ranking SST distractors");
+			List<Distractor> selectedSSTDistractors=DistractorGenerator.rankDistractor(answerSentence, answerPhrase, sstDistractorList);
+			if(selectedSSTDistractors!=null){
+				for(Distractor distractor:selectedSSTDistractors){
+				System.out.println(distractor.distractorWord+" "+distractor.weight);
+				selectedDistractors.add(distractor);
+			}
 			 
-		 }
+		}
 		
 		}
 		if(distractorCount<3){
-			 posDistractorList=DistractorFilter.removeSSTDistractorsFromPOSDistractorList(posDistractorList,sstDistractorList);
 			 posDistractorList=DistractorFilter.removeAnswerPhraseWordsFromDistractorList(originalAnsPhrase, posDistractorList);
+			 posDistractorList=DistractorFilter.removeSSTDistractorsFromPOSDistractorList(posDistractorList,sstDistractorList);
 			 if(isAnsPhraseProperNoun(answerPhrase)){
 					System.out.println("POS distractors: ");
 					for(String word:posDistractorList){
@@ -251,6 +248,7 @@ public class QuestionAsker {
 			Tree ansTree = question.getAnswerPhraseTree();
 			if(ansTree != null){
 				ansPhrase = AnalysisUtilities.getCleanedUpYield(question.getAnswerPhraseTree());
+				originalAnsPhrase=ansPhrase;
 				System.out.println("Answer Phrase detected :"+ansPhrase);
 				if (!isAnsPhraseProperNoun(ansPhrase)&&(countWords(ansPhrase)>=2)) {
 					System.out.println("Resolving answerphrase to a single word...");
@@ -272,14 +270,10 @@ public class QuestionAsker {
 				
 			}
 			else{
-		
-			//	System.out.println("VISHNU yes/no");
 				String ansSentence = question.getSourceTree().yield().toString();
 				System.out.println("Answer Sentence :"+ansSentence);
 				
 			}
-			//System.out.println("Question type : "+question.);
-			//if(printVerbose) 
 			
 		}
 
@@ -597,9 +591,13 @@ public class QuestionAsker {
 				//now print the questions
 				
 				int questionCount=1;
+				List<String> reasoningQuestionList=new ArrayList<String>();
 				for(Question question: outputQuestionList){
 					String ansPhrase="";
 					String originalAnsPhrase="";
+					
+					Tree ansTree = question.getAnswerPhraseTree();
+					
 						
 					if(question.getTree().getLeaves().size() > maxLength){
 						continue;
@@ -614,9 +612,15 @@ public class QuestionAsker {
 					questionCount++;
 					System.out.println("Question :"+question.yield());
 					System.out.println("Score :"+question.getScore());
-					Tree ansTree = question.getAnswerPhraseTree();
+					//if ansTree is null, there is no answer phrase.So don't call distractor generator
 					if(ansTree != null){
 						ansPhrase = AnalysisUtilities.getCleanedUpYield(question.getAnswerPhraseTree());
+						originalAnsPhrase=ansPhrase;
+						//TODO: if ansPhrase is PRP(pronoun) dont call distractorGenerator
+						if(ansPhrase.equalsIgnoreCase("it")||ansPhrase.equalsIgnoreCase("they")){
+							//TODO: logic has to be done to resolve "it" and "they"
+							continue;
+						}
 						System.out.println("Answer Phrase detected :"+ansPhrase);
 						if (!isAnsPhraseProperNoun(ansPhrase)&&(countWords(ansPhrase)>=2)) {
 							System.out.println("Resolving answerphrase to a single word...");
@@ -638,18 +642,23 @@ public class QuestionAsker {
 						
 					}
 					else{
-				
-						//System.out.println("VISHNU yes/no");
 						System.out.println("Answer Phrase :"+"Yes");
-						
 						String ansSentence = question.getSourceTree().yield().toString();
 						System.out.println("Answer Sentence :"+ansSentence);
-						
+						String questionSentence=question.yield();
+						Character firstChar=questionSentence.charAt(0);
+						firstChar=Character.toLowerCase(firstChar);
+						StringBuilder qS=new StringBuilder(questionSentence);
+						qS.setCharAt(0,firstChar);
+						reasoningQuestionList.add("Why "+qS);
 					}
-					//System.out.println("Question type : "+question.);
-					//if(printVerbose) 
 					
 				}
+				System.out.println("Reasoning questions: ");
+				for(String reasoningQuestion:reasoningQuestionList){
+					System.out.println(reasoningQuestion);
+				}
+				
 	
 			}//child while block ends
 			}
@@ -950,11 +959,10 @@ public class QuestionAsker {
 	    }
 	    return wordCount;
 	}
-	//after POS tag merges all proper nouns together, it writes the proper noun list as file
-	//read the file and populate the nounPhrase Set
+	//after POS tag merges all  NNP	(Proper noun, singular) together, it writes the proper noun list in a  file
+	//Now read the file and populate the nounPhrase Set
 	 public static boolean populateNounPhraseSet(){
-		 //System.out.println("VISHNU is in: populateNounPhraseSet()");
-	    	if(isNounPhraseSetPopulated==false){
+		 	if(isNounPhraseSetPopulated==false){
 	    		System.out.println("populating nounPhrase Set");
 	    		BufferedReader in = null;
 	    		try {

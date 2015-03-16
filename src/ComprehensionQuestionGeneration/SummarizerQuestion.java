@@ -37,7 +37,9 @@ public class SummarizerQuestion {
 			}catch(Exception e){ System.out.println("Exception:"+e);}
 	}
 	public static void main(String[] args) {
+
 		generateSummarizerQuestion("/home/narain/workspace/questiongeneration/input3.txt");
+
 	}
 
 }
