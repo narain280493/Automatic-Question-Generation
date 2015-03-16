@@ -138,8 +138,8 @@ public class QuestionAsker {
 		
 		}
 		if(distractorCount<3){
-			 posDistractorList=DistractorFilter.removeSSTDistractorsFromPOSDistractorList(posDistractorList,sstDistractorList);
 			 posDistractorList=DistractorFilter.removeAnswerPhraseWordsFromDistractorList(originalAnsPhrase, posDistractorList);
+			 posDistractorList=DistractorFilter.removeSSTDistractorsFromPOSDistractorList(posDistractorList,sstDistractorList);
 			 if(isAnsPhraseProperNoun(answerPhrase)){
 					System.out.println("POS distractors: ");
 					for(String word:posDistractorList){
@@ -166,7 +166,7 @@ public class QuestionAsker {
 			multipleChoices.add(distractor.distractorWord);
 			i++;
 		}
-		multipleChoices.add(originalAnsPhrase);
+		multipleChoices.add(answerPhrase);
 		if(multipleChoices.size()>=3){
 		Collections.shuffle(multipleChoices);
 		System.out.println("****************************************************************************************");
@@ -237,6 +237,7 @@ public class QuestionAsker {
 			Tree ansTree = question.getAnswerPhraseTree();
 			if(ansTree != null){
 				ansPhrase = AnalysisUtilities.getCleanedUpYield(question.getAnswerPhraseTree());
+				originalAnsPhrase=ansPhrase;
 				System.out.println("Answer Phrase detected :"+ansPhrase);
 				if (!isAnsPhraseProperNoun(ansPhrase)&&(countWords(ansPhrase)>=2)) {
 					System.out.println("Resolving answerphrase to a single word...");
@@ -434,6 +435,7 @@ public class QuestionAsker {
 				for(Question question: outputQuestionList){
 					String ansPhrase="";
 					String originalAnsPhrase="";
+					
 					Tree ansTree = question.getAnswerPhraseTree();
 					
 						
@@ -453,6 +455,7 @@ public class QuestionAsker {
 					//if ansTree is null, there is no answer phrase.So don't call distractor generator
 					if(ansTree != null){
 						ansPhrase = AnalysisUtilities.getCleanedUpYield(question.getAnswerPhraseTree());
+						originalAnsPhrase=ansPhrase;
 						//TODO: if ansPhrase is PRP(pronoun) dont call distractorGenerator
 						if(ansPhrase.equalsIgnoreCase("it")||ansPhrase.equalsIgnoreCase("they")){
 							//TODO: logic has to be done to resolve "it" and "they"

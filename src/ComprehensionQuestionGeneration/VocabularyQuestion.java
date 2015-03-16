@@ -320,9 +320,10 @@ public class VocabularyQuestion {
 	*/
 	
 	public static void main(String[] args) {
-		populateTagMap("/home/vishnu/workspace/QuestionGeneration/earthquake.txt");
-		generateMatchTheSynonymQuestion("/home/vishnu/workspace/QuestionGeneration/earthquake.txt");
-		generateMatchTheDefinitionQuestion("/home/vishnu/workspace/QuestionGeneration/earthquake.txt");
+		String fileName="earthquake.txt";
+		populateTagMap("/home/vishnu/workspace/QuestionGeneration/"+fileName);
+		generateMatchTheSynonymQuestion("/home/vishnu/workspace/QuestionGeneration/"+fileName);
+		generateMatchTheDefinitionQuestion("/home/vishnu/workspace/QuestionGeneration/"+fileName);
 		
 		
 	}
