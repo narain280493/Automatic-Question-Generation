@@ -34,3 +34,6 @@ local.properties
 
 # TeXlipse plugin
 .texlipse
+
+#remove configuration file
+src/Configuration/
