@@ -1,0 +1,48 @@
+# comments start with # and the comment line must start with # (without any spaces before).
+# the unmovable marker must be unmv.
+# Adjunct clauses under verb phrases. Such phrases typically follow commas.
+# checked
+VP < (S=unmv $,, /,/)
+
+# Clause-level modifiers, which are any nodes directly under a clausal, or "S", node except nouns and verbs.
+# checked
+S < PP|ADJP|ADVP|S|SBAR=unmv
+
+# Phrases under conjunctions. A single conjoined node cannot undergo WH-movement while its siblings do not (e.g. * Who did John meet and Mary? from John met Bob and Mary.).
+# ?????
+/\\.*/ < CC << NP|ADJP|VP|ADVP|PP=unmv
+
+# Noun phrases in adjunct clauses, assuming subordinate clauses with an explicit complementizer other than that are adjuncts (e.g., whether a recession is on the horizon).
+# checked
+SBAR < (IN|DT < /[^that]/) << NP|PP=unmv
+
+# Phrases under a question phrase. This constraint is related to the idea of subjacency (Chomsky, 1973), as is the next.
+# checked
+SBAR < /^WH.*P$/ << NP|ADJP|VP|ADVP|PP=unmv
+
+# The subject of a complement phrase when an explicit complementizer is present (e.g. *Who did John say that is old? from John said that Bob is old.).
+# checked
+SBAR <, IN|DT < (S < (NP=unmv !$,, VP))
+
+# Phrases under unmovable nodes. This propagates the constraints down the tree.
+# checked
+@UNMV << NP|ADJP|VP|ADVP|PP=unmv
+
+# Any nodes under an otherwise movable phrase. This encodes the constraint that noun phrases are islands to movement.
+# too general? maybe we should remove PP from the list
+# NP|PP|ADJP|ADVP << NP|ADJP|VP|ADVP|PP=unmv
+
+# OPTIONAL #
+
+# Prepositional phrases that do not have a noun phrase object (e.g., on seeing an old friend).
+# This could also wrongly mark (e.g.1, on August 29, 1958, e.g.2, in Gary, Indiana)
+#PP=unmv !< NP
+
+# Both of a pair of noun phrases that are siblings in the tree (e.g., to avoid *Who did John give a book? from John gave Mary a book.).
+S < (NP=unmv $ NP|UNMV-NP)
+
+# Existential there noun phrases. This ensures against spurious questions such as "What was a dog in the park?" being generated from There was a dog in the park.
+NP=unmv < EX
+
+# Any NP under a ()
+NP=unmv >> PRN
