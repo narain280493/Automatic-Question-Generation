@@ -1,1 +1,0 @@
-The name lists in this directory were downloaded from the US Census website in early 2010.
