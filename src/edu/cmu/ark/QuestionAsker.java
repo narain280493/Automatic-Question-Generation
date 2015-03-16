@@ -37,6 +37,8 @@ import java.util.*;
 
 import ComprehensionQuestionGeneration.VocabularyQuestion;
 import Configuration.Configuration;
+import distractorgeneration.Distractor;
+import distractorgeneration.DistractorFilter;
 import distractorgeneration.DistractorGenerator;
 import edu.stanford.nlp.trees.CollinsHeadFinder;
 //import edu.cmu.ark.ranking.WekaLinearRegressionRanker;
@@ -82,7 +84,7 @@ public class QuestionAsker {
 	}
 	
 	
-	public static void generateDistractor(String fileName,String answerPhrase,String answerSentence){
+	public static void generateDistractor(String fileName,String originalAnsPhrase,String answerPhrase,String answerSentence){
 		//our code for distractor generator
 		int distractorCount=0;
 		System.out.println("Distractor generation starts:");
@@ -90,9 +92,13 @@ public class QuestionAsker {
 		//which is then used by SST tagger
 		List<String>posDistractorList= new ArrayList<String>();
 		List<String>sstDistractorList= new ArrayList<String>();
+		List<Distractor> selectedDistractors = new ArrayList<Distractor>();
 		List<String>posList=DistractorGenerator.getPOSTaggerDistractors(Configuration.INPUT_FILE_PATH+INPUT_FILE_NAME, answerPhrase);
-		
+		//NOTE: Call populateNounPhraseSet function only after POSTagger
+		populateNounPhraseSet();
 		List<String>sstList=DistractorGenerator.getSSTTaggerDistractors(Configuration.INPUT_FILE_PATH+INPUT_FILE_NAME, answerPhrase);
+		sstList=DistractorFilter.removeAnswerPhraseWordsFromDistractorList(originalAnsPhrase, sstList);
+		
 		System.out.println("No. of SST Distractors found :"+(sstList.size()-1));
 		//stage 1 SuperSenseTagger
 								   
@@ -106,20 +112,81 @@ public class QuestionAsker {
 		
 		
 		//stage 2 POSTagger
-			System.out.println("No. of POS Distractors found :"+(posList.size()-1));
-			distractorCount+=(posList.size()-1);
-		    for(int i=1;i<posList.size();i++){
-		//    	System.out.println("Distractor :"+posList.get(i));
-		    }
-		System.out.println("Ranking SST distractors");
+		System.out.println("No. of POS Distractors found :"+(posList.size()-1));
+
+		 
 		posDistractorList.addAll(posList);
 		sstDistractorList.addAll(sstList);
 		//remove "yes" or "no" which is the first element in the sst and pos list 
 		posDistractorList.remove(0);
 		sstDistractorList.remove(0);
-		DistractorGenerator.rankDistractor(answerSentence, answerPhrase, sstDistractorList);
+		if(isAnsPhraseProperNoun(answerPhrase)){
+			System.out.println("SST distractors: ");
+			for(String word:sstDistractorList){
+				selectedDistractors.add(new Distractor(word, 1));
+				System.out.println(word);
+			}
+			
+		}
+		else{
+		System.out.println("Ranking SST distractors");
+		List<Distractor> selectedSSTDistractors=DistractorGenerator.rankDistractor(answerSentence, answerPhrase, sstDistractorList);
+		 if(selectedSSTDistractors!=null){
+			 for(Distractor distractor:selectedSSTDistractors){
+				 System.out.println(distractor.distractorWord+" "+distractor.weight);
+				 selectedDistractors.add(distractor);
+			 }
+			 
+		 }
+		
+		}
+		if(distractorCount<3){
+			 posDistractorList=DistractorFilter.removeSSTDistractorsFromPOSDistractorList(posDistractorList,sstDistractorList);
+			 posDistractorList=DistractorFilter.removeAnswerPhraseWordsFromDistractorList(originalAnsPhrase, posDistractorList);
+			 if(isAnsPhraseProperNoun(answerPhrase)){
+					System.out.println("POS distractors: ");
+					for(String word:posDistractorList){
+						selectedDistractors.add(new Distractor(word, 1));
+						System.out.println(word);
+					}
+			}
+			else{
+			 System.out.println("Ranking POS distractors");
+			 List<Distractor> selectedPOSDistractors=DistractorGenerator.rankDistractor(answerSentence, answerPhrase, posDistractorList);
+			 if(selectedPOSDistractors!=null){
+				 for(Distractor distractor:selectedPOSDistractors){
+					 System.out.println(distractor.distractorWord+" "+distractor.weight);
+					 selectedDistractors.add(distractor);
+				 }
+			 }
+			}
+		 }
+		List<String> multipleChoices=new ArrayList<String>();
+		int i=1;
+		for(Distractor distractor:selectedDistractors){
+			if(i==3)
+				break;
+			multipleChoices.add(distractor.distractorWord);
+			i++;
+		}
+		multipleChoices.add(answerPhrase);
+		if(multipleChoices.size()>=3){
+		Collections.shuffle(multipleChoices);
+		System.out.println("****************************************************************************************");
+		System.out.println("Multiple choices:");
+		int choiceNumber=1;
+		for(String choice:multipleChoices){
+			System.out.print(choiceNumber+++")"+choice+"\t");
+		}
+		System.out.println();
+		System.out.println("****************************************************************************************");
+		}
+		
 	}
 	public static  void getQuestionsForSentence(String sentence){
+		
+		System.out.println("Summary:"+sentence);
+		String modelPath = "models/linear-regression-ranker-reg500.ser.gz";
 		List<Tree> inputTrees = new ArrayList<Tree>();
 		Tree parsed;
 		InitialTransformationStep trans = new InitialTransformationStep();
@@ -132,15 +199,23 @@ public class QuestionAsker {
 		
 		
 		List<Question> outputQuestionList = new ArrayList<Question>();
+		AnalysisUtilities.getInstance();
+		GlobalProperties.setDebug(true);
 		
+		if(modelPath != null){
+			System.err.println("Loading question ranking models from "+modelPath+"...");
+			qr = new QuestionRanker();
+			qr.loadModel(modelPath);
+		}
 		
 		parsed = AnalysisUtilities.getInstance().parseSentence(sentence).parse;
 		inputTrees.add(parsed);
 		
-		
+	
+		System.out.println("Parse Tree-"+parsed);
 		//step 1 transformations
 		List<Question> transformationOutput = trans.transform(inputTrees);
-		
+		System.out.println("Step 1");
 		//step 2 question transducer
 		for(Question t: transformationOutput){
 			if(GlobalProperties.getDebug()) System.err.println("Stage 2 Input: "+t.getIntermediateTree().yield().toString());
@@ -150,7 +225,7 @@ public class QuestionAsker {
 		
 		//remove duplicates
 		QuestionTransducer.removeDuplicateQuestions(outputQuestionList);
-		
+		System.out.println("step2");
 		//step 3 ranking
 		if(qr != null){
 			qr.scoreGivenQuestions(outputQuestionList);
@@ -158,12 +233,13 @@ public class QuestionAsker {
 			QuestionRanker.adjustScores(outputQuestionList, inputTrees, avoidFreqWords, preferWH, downweightPronouns, doStemming);
 			QuestionRanker.sortQuestions(outputQuestionList, false);
 		}
-		
+		System.out.println("step3");
 		//now print the questions
 		
-		String ansPhrase="";
 		for(Question question: outputQuestionList){
-			
+			String ansPhrase="";
+			String originalAnsPhrase="";
+				
 			if(question.getTree().getLeaves().size() > maxLength){
 				continue;
 			}
@@ -171,6 +247,7 @@ public class QuestionAsker {
 				continue;
 			}
 			System.out.println("Question :"+question.yield());
+			System.out.println("Score :"+question.getScore());
 			Tree ansTree = question.getAnswerPhraseTree();
 			if(ansTree != null){
 				ansPhrase = AnalysisUtilities.getCleanedUpYield(question.getAnswerPhraseTree());
@@ -188,24 +265,182 @@ public class QuestionAsker {
 						ansPhrase=headWord;
 					}
 				}
+				System.out.println("Answer Phrase :"+ansPhrase);
+				String ansSentence = question.getSourceTree().yield().toString();
+				System.out.println("Answer Sentence :"+ansSentence);
+				generateDistractor(INPUT_FILE_NAME, originalAnsPhrase, ansPhrase, ansSentence);
+				
 			}
-			System.out.println("Answer Phrase :"+ansPhrase);
+			else{
+		
+			//	System.out.println("VISHNU yes/no");
+				String ansSentence = question.getSourceTree().yield().toString();
+				System.out.println("Answer Sentence :"+ansSentence);
+				
+			}
+			//System.out.println("Question type : "+question.);
 			//if(printVerbose) 
-			System.out.println("Score :"+question.getScore());
-			String ansSentence = question.getSourceTree().yield().toString();
-			System.out.println("Answer Sentence :"+ansSentence);
-			generateDistractor(INPUT_FILE_NAME, ansPhrase, ansSentence);
+			
 		}
 
-
+		System.out.println("qg over");
 	
 	}
 	/**
 	 * @param args
+	 * @return 
 	 * @throws ParseException 
 	 */
+	/*public void getQues(String summary)
+	{
+		QuestionTransducer qt = new QuestionTransducer();
+		InitialTransformationStep trans = new InitialTransformationStep();
+		
+		
+		qt.setAvoidPronounsAndDemonstratives(false);
+		
+		//pre-load
+		AnalysisUtilities.getInstance();
+		
+		String buf;
+		Tree parsed;
+		boolean printVerbose = true;//setting printVerbose true always
+		String modelPath = "models/linear-regression-ranker-reg500.ser.gz";
+		
+		List<Question> outputQuestionList = new ArrayList<Question>();
+		boolean preferWH = false;
+		boolean doNonPronounNPC = false;
+		boolean doPronounNPC = true;
+		Integer maxLength = 1000;
+		boolean downweightPronouns = false;
+		boolean avoidFreqWords = false;
+		boolean dropPro = true;
+		boolean justWH = false;
+		
+		
+				GlobalProperties.setDebug(true);
+			
+		qt.setAvoidPronounsAndDemonstratives(dropPro);
+		trans.setDoPronounNPC(doPronounNPC);
+		trans.setDoNonPronounNPC(doNonPronounNPC);
+		
+		if(modelPath != null){
+			System.err.println("Loading question ranking models from "+modelPath+"...");
+			qr = new QuestionRanker();
+			qr.loadModel(modelPath);
+		}
+		
+		try{
+			
+				if(GlobalProperties.getDebug()) System.err.println("\nInput TextFile:");
+				String doc;
 	
-	public static void main(String[] args) throws ParseException {
+				String query = summary;
+				System.out.println("Query read is :"+query);
+				
+				outputQuestionList.clear();
+				
+				
+				
+				
+				//iterate over each segmented sentence and generate questions
+				ArrayList<Tree> inputTrees =new ArrayList<Tree>();
+				
+				
+					parsed = AnalysisUtilities.getInstance().parseSentence(summary).parse;
+					inputTrees.add(parsed);
+				
+				
+			//	if(GlobalProperties.getDebug()) System.err.println("Seconds Elapsed Parsing:\t"+((System.currentTimeMillis()-startTime)/1000.0));
+				
+				//step 1 transformations
+				Question transformationOutput = (Question) trans.transform(inputTrees);
+				
+				
+				//	if(GlobalProperties.getDebug()) System.err.println("Stage 2 Input: "+t.getIntermediateTree().yield().toString());
+					qt.generateQuestionsFromParse(transformationOutput);
+					outputQuestionList.addAll(qt.getQuestions());
+							
+				
+				//remove duplicates
+				QuestionTransducer.removeDuplicateQuestions(outputQuestionList);
+				
+				//step 3 ranking
+				if(qr != null){
+					qr.scoreGivenQuestions(outputQuestionList);
+					boolean doStemming = true;
+					QuestionRanker.adjustScores(outputQuestionList, inputTrees, avoidFreqWords, preferWH, downweightPronouns, doStemming);
+					QuestionRanker.sortQuestions(outputQuestionList, false);
+				}
+				
+				//now print the questions
+				
+				int questionCount=1;
+				for(Question question: outputQuestionList){
+					String ansPhrase="";
+					String originalAnsPhrase="";
+						
+					if(question.getTree().getLeaves().size() > maxLength){
+						continue;
+					}
+					if(justWH && question.getFeatureValue("whQuestion") != 1.0){
+						continue;
+					}
+					System.out.println();
+					System.out.println("=====================================================================================================");
+					System.out.println();
+					System.out.println("QuestionCount: "+questionCount);
+					questionCount++;
+					System.out.println("Question :"+question.yield());
+					System.out.println("Score :"+question.getScore());
+					Tree ansTree = question.getAnswerPhraseTree();
+					if(ansTree != null){
+						ansPhrase = AnalysisUtilities.getCleanedUpYield(question.getAnswerPhraseTree());
+						System.out.println("Answer Phrase detected :"+ansPhrase);
+						if (!isAnsPhraseProperNoun(ansPhrase)&&(countWords(ansPhrase)>=2)) {
+							System.out.println("Resolving answerphrase to a single word...");
+							String headWord=null;
+							try {
+								headWord = resolveHead(ansPhrase);
+							} catch (ParseException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+							if(headWord!=null){
+								ansPhrase=headWord;
+							}
+						}
+						System.out.println("Answer Phrase :"+ansPhrase);
+						String ansSentence = question.getSourceTree().yield().toString();
+						System.out.println("Answer Sentence :"+ansSentence);
+						generateDistractor(INPUT_FILE_NAME, originalAnsPhrase, ansPhrase, ansSentence);
+						
+					}
+					else{
+				
+						//System.out.println("VISHNU yes/no");
+						System.out.println("Answer Phrase :"+"Yes");
+						
+						String ansSentence = question.getSourceTree().yield().toString();
+						System.out.println("Answer Sentence :"+ansSentence);
+						
+					}
+					//System.out.println("Question type : "+question.);
+					//if(printVerbose) 
+					
+				}
+	
+			
+			
+
+			//	VocabularyQuestion.populateTagMap();
+			//parent while block ends
+		}//try block ends
+		catch(Exception e){
+			e.printStackTrace();
+		}
+	}*/
+	public static void main(String [] args) throws ParseException {
 		
 		QuestionTransducer qt = new QuestionTransducer();
 		InitialTransformationStep trans = new InitialTransformationStep();
@@ -330,20 +565,20 @@ public class QuestionAsker {
 				List<Tree> inputTrees = new ArrayList<Tree>();
 				
 				for(String sentence: sentences){
-					if(GlobalProperties.getDebug()) System.err.println("Question Asker: sentence: "+sentence);
+					//if(GlobalProperties.getDebug()) System.err.println("Question Asker: sentence: "+sentence);
 					
 					parsed = AnalysisUtilities.getInstance().parseSentence(sentence).parse;
 					inputTrees.add(parsed);
 				}
 				
-				if(GlobalProperties.getDebug()) System.err.println("Seconds Elapsed Parsing:\t"+((System.currentTimeMillis()-startTime)/1000.0));
+			//	if(GlobalProperties.getDebug()) System.err.println("Seconds Elapsed Parsing:\t"+((System.currentTimeMillis()-startTime)/1000.0));
 				
 				//step 1 transformations
 				List<Question> transformationOutput = trans.transform(inputTrees);
 				
 				//step 2 question transducer
 				for(Question t: transformationOutput){
-					if(GlobalProperties.getDebug()) System.err.println("Stage 2 Input: "+t.getIntermediateTree().yield().toString());
+				//	if(GlobalProperties.getDebug()) System.err.println("Stage 2 Input: "+t.getIntermediateTree().yield().toString());
 					qt.generateQuestionsFromParse(t);
 					outputQuestionList.addAll(qt.getQuestions());
 				}			
@@ -361,40 +596,61 @@ public class QuestionAsker {
 				
 				//now print the questions
 				
-				String ansPhrase="";
+				int questionCount=1;
 				for(Question question: outputQuestionList){
+					String ansPhrase="";
+					String originalAnsPhrase="";
+						
 					if(question.getTree().getLeaves().size() > maxLength){
 						continue;
 					}
 					if(justWH && question.getFeatureValue("whQuestion") != 1.0){
 						continue;
 					}
+					System.out.println();
+					System.out.println("=====================================================================================================");
+					System.out.println();
+					System.out.println("QuestionCount: "+questionCount);
+					questionCount++;
 					System.out.println("Question :"+question.yield());
-					//if(printVerbose) System.out.print("\t"+AnalysisUtilities.getCleanedUpYield(question.getSourceTree()));
+					System.out.println("Score :"+question.getScore());
 					Tree ansTree = question.getAnswerPhraseTree();
-					
-					//if(printVerbose) System.out.print("\t");
 					if(ansTree != null){
 						ansPhrase = AnalysisUtilities.getCleanedUpYield(question.getAnswerPhraseTree());
 						System.out.println("Answer Phrase detected :"+ansPhrase);
 						if (!isAnsPhraseProperNoun(ansPhrase)&&(countWords(ansPhrase)>=2)) {
 							System.out.println("Resolving answerphrase to a single word...");
-							String headWord=resolveHead(ansPhrase);
+							String headWord=null;
+							try {
+								headWord = resolveHead(ansPhrase);
+							} catch (ParseException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
 							if(headWord!=null){
 								ansPhrase=headWord;
 							}
 						}
+						System.out.println("Answer Phrase :"+ansPhrase);
+						String ansSentence = question.getSourceTree().yield().toString();
+						System.out.println("Answer Sentence :"+ansSentence);
+						generateDistractor(INPUT_FILE_NAME, originalAnsPhrase, ansPhrase, ansSentence);
+						
 					}
-					System.out.println("Answer Phrase :"+ansPhrase);
+					else{
+				
+						//System.out.println("VISHNU yes/no");
+						System.out.println("Answer Phrase :"+"Yes");
+						
+						String ansSentence = question.getSourceTree().yield().toString();
+						System.out.println("Answer Sentence :"+ansSentence);
+						
+					}
+					//System.out.println("Question type : "+question.);
 					//if(printVerbose) 
-					System.out.println("Score :"+question.getScore());
-					String ansSentence = question.getSourceTree().yield().toString();
-					System.out.println("Answer Sentence :"+ansSentence);
 					
-					//System.err.println("Answer depth: "+question.getFeatureValue("answerDepth"));
-
-					generateDistractor(INPUT_FILE_NAME, ansPhrase, ansSentence);
 				}
+	
 			}//child while block ends
 			}
 
@@ -416,6 +672,223 @@ public class QuestionAsker {
 		}
 		System.out.println();
 	}
+	public static String HeadWordResolver(String ansPhrase) throws ParseException{
+		int index=0;
+		boolean ruleMatch = false;
+		boolean commonnounPresent = false;
+		boolean propernounPresent = false;
+		
+		String[] output=new String[50];
+		
+		String tregexMatchNounPhraseConjunctionModifier = "NP=nounphrase1$..CC=conj$..NP=nounphrase2";
+		String tregexMatchProperNounConjunctionModifier ="NNP=noun1$..CC=conj$..NNP=noun2";
+		String tregexMatchCommonNounModifier ="NN=commonnoun";
+		String tregexMatchProperNounModifier ="NNP=propernounsingular";
+		String tregexMatchProperNounPluralModifier ="NNPS=propernounplural";
+		String tregexMatchNounPhraseModifier = "NP=nounphrase";
+		
+		TregexPattern tregexPatternMatchNounPhraseConjunctionModifier;
+		TregexPattern tregexPatternMatchProperNounConjunctionModifier;
+		TregexPattern tregexPatternMatchCommonNounModifier;
+		TregexPattern tregexPatternMatchNounPhraseModifier;
+		TregexPattern tregexPatternMatchProperNounModifier;
+		TregexPattern tregexPatternMatchProperNounPluralModifier;
+		
+		TregexMatcher tregexPatternMatchNounPhraseConjunctionMatcher;
+		TregexMatcher tregexPatternMatchProperNounConjunctionMatcher;
+		TregexMatcher tregexPatternMatchCommonNounMatcher;
+		TregexMatcher tregexPatternMatchNounPhraseMatcher;
+		TregexMatcher tregexPatternMatchProperNounMatcher;
+		
+		tregexPatternMatchNounPhraseConjunctionModifier = TregexPattern.compile(tregexMatchNounPhraseConjunctionModifier);
+		tregexPatternMatchProperNounConjunctionModifier = TregexPattern.compile(tregexMatchProperNounConjunctionModifier);
+		tregexPatternMatchCommonNounModifier = TregexPattern.compile(tregexMatchCommonNounModifier);
+		tregexPatternMatchNounPhraseModifier = TregexPattern.compile(tregexMatchNounPhraseModifier);
+		tregexPatternMatchProperNounModifier = TregexPattern.compile(tregexMatchProperNounModifier);
+		tregexPatternMatchProperNounPluralModifier = TregexPattern.compile(tregexMatchProperNounPluralModifier);
+		
+		CollinsHeadFinder headFinder = new CollinsHeadFinder();
+		
+		try {
+			StanfordParser.initialize();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		Tree tree = StanfordParser.parseTree(ansPhrase);
+		System.out.println(tree);
+	
+		Tree npHeadTree = headFinder.determineHead(tree);
+		String tag = npHeadTree.label().toString();
+		if(tag.contains("PP"))
+		{
+			String originalString = TreeUtil.getLabel(npHeadTree);
+			if(originalString.contains("for"))
+			{
+				originalString = originalString.replace("for","");
+				System.out.println("Removed for:"+originalString);
+				//System.out.println("for present");
+			    tree = StanfordParser.parseTree(originalString);
+				//System.out.println(tree);
+			} 
+			else if(originalString.contains("to"))
+			{
+				originalString = originalString.replace("to","");
+				tree = StanfordParser.parseTree(originalString);
+				System.out.println("to present");
+			}
+			
+			//Add other prepositions here
+		}
+		//System.out.println("Tag"+tag);
+		
+		tregexPatternMatchNounPhraseConjunctionMatcher = tregexPatternMatchNounPhraseConjunctionModifier.matcher(tree);
+		tregexPatternMatchProperNounConjunctionMatcher = tregexPatternMatchProperNounConjunctionModifier.matcher(tree);
+		tregexPatternMatchNounPhraseMatcher = tregexPatternMatchNounPhraseModifier.matcher(tree);
+		
+		// Tregex Rule NP CC NP
+		while (tregexPatternMatchNounPhraseConjunctionMatcher.find()) {
+			System.out.println("RuleMatch: NP CC NP");
+			Tree nounTree = tregexPatternMatchNounPhraseConjunctionMatcher.getNode("nounphrase1");
+       		String NP1 = TreeUtil.getLabel(nounTree);
+       		tregexPatternMatchCommonNounMatcher = tregexPatternMatchCommonNounModifier.matcher(nounTree);
+       		while(tregexPatternMatchCommonNounMatcher.find())
+       		{
+       			System.out.println("NP1 has a common noun");
+       			Tree commonNoun=tregexPatternMatchCommonNounMatcher.getNode("commonnoun");
+       			String commonnoun = TreeUtil.getLabel(commonNoun);
+       			System.out.println("CommonNoun:"+commonnoun);
+       			output[index++]=commonnoun;
+       			commonnounPresent=true;
+           	}
+       		if(commonnounPresent == false)
+       		{
+       			output[index++]=NP1;
+       			//commonnounPresent= false;
+       		}
+       		
+       		Tree conjTree = tregexPatternMatchNounPhraseConjunctionMatcher.getNode("conj");
+       		String conjheadTag = TreeUtil.getLabel(conjTree);
+       		output[index++]=conjheadTag;
+       		
+       		commonnounPresent= false;
+       		Tree nounTree2 = tregexPatternMatchNounPhraseConjunctionMatcher.getNode("nounphrase2");
+       		String NP2 = TreeUtil.getLabel(nounTree2);
+       		tregexPatternMatchCommonNounMatcher = tregexPatternMatchCommonNounModifier.matcher(nounTree2);
+       		while(tregexPatternMatchCommonNounMatcher.find())
+       		{
+       			System.out.println("NP2 has a common noun");
+       			Tree commonNoun=tregexPatternMatchCommonNounMatcher.getNode("commonnoun");
+       			String commonnoun = TreeUtil.getLabel(commonNoun);
+       			System.out.println("CommonNoun:"+commonnoun);
+       			output[index++]=commonnoun;
+       			commonnounPresent = true;
+       		}
+       		if(commonnounPresent == false)
+       		{
+       			output[index++]=NP2;
+       			
+       		}
+       		
+       
+			System.out.println("Noun1: "+NP1+"\tConj:"+conjheadTag+"\t Noun2:"+NP2);
+						
+				
+				
+			
+			
+		System.out.println("SIize of output array="+index);
+		System.out.println("Output"+output[0]+output[1]+output[2]);
+		ruleMatch= true;
+		}
+		
+		
+		
+		if(ruleMatch==false){
+		while (tregexPatternMatchProperNounConjunctionMatcher.find()){
+		Tree nounTree = tregexPatternMatchProperNounConjunctionMatcher.getNode("noun1");
+   		String properNoun1 = TreeUtil.getLabel(nounTree);
+   		output[index++]=properNoun1;
+
+   		Tree conjTree = tregexPatternMatchProperNounConjunctionMatcher.getNode("conj");
+   		String conjheadTag = TreeUtil.getLabel(conjTree);
+   		output[index++]=conjheadTag;
+   		
+   		Tree nounTree2 = tregexPatternMatchProperNounConjunctionMatcher.getNode("noun2");
+   		String properNoun2 = TreeUtil.getLabel(nounTree2);
+   		output[index++]=properNoun2;
+
+   		
+   		System.out.println("Noun1: "+properNoun1+"\tConj:"+conjheadTag+"\t Noun2:"+properNoun2);
+   		
+		System.out.println("SIize of output array="+index);
+		System.out.println("Output"+output[0]+output[1]+output[2]);
+   		ruleMatch=true;
+		}
+		}
+		
+		if(ruleMatch==false){
+		tregexPatternMatchNounPhraseMatcher.find();
+			
+			Tree nounTree = tregexPatternMatchNounPhraseMatcher.getNode("nounphrase");
+       		tregexPatternMatchProperNounMatcher = tregexPatternMatchProperNounModifier.matcher(nounTree);
+       		while(tregexPatternMatchProperNounMatcher.find())
+       		{
+       			System.out.println("ProperNoun present");
+       			Tree properNoun=tregexPatternMatchProperNounMatcher.getNode("propernounsingular");
+       	//		Tree properNounPlural=tregexPatternMatchProperNounMatcher.getNode("propernounplural");
+       		//	String propernounplural= TreeUtil.getLabel(properNounPlural);
+       			//System.out.println(propernounplural);
+       			String propernoun = TreeUtil.getLabel(properNoun);
+       			output[index++]=propernoun;
+       			propernounPresent=true;
+       		}
+       		tregexPatternMatchProperNounMatcher = tregexPatternMatchProperNounPluralModifier.matcher(nounTree);
+       		while(tregexPatternMatchProperNounMatcher.find())
+       		{
+       			System.out.println("ProperNoun plural present");
+       			Tree properNounPlural=tregexPatternMatchProperNounMatcher.getNode("propernounplural");
+       			String propernounplural= TreeUtil.getLabel(properNounPlural);
+       			System.out.println(propernounplural);
+       			String propernoun = TreeUtil.getLabel(properNounPlural);
+       			output[index++]=propernoun;
+       			propernounPresent=true;
+       		}
+			
+       		if(propernounPresent==false){
+       		
+       		System.out.println("Proper noun not present");
+       		tregexPatternMatchCommonNounMatcher = tregexPatternMatchCommonNounModifier.matcher(nounTree);
+       		while(tregexPatternMatchCommonNounMatcher.find())
+       		{
+       			Tree commonNoun=tregexPatternMatchCommonNounMatcher.getNode("commonnoun");
+       			String commonnoun = TreeUtil.getLabel(commonNoun);
+       			System.out.println("CommonNoun:"+commonnoun);
+       			output[index++]=commonnoun;
+       			commonnounPresent=true;
+           	}
+       		if(commonnounPresent==false){
+       		Tree npHead = headFinder.determineHead(nounTree);
+       		String headTag = TreeUtil.getLabel(npHead);
+       		output[index++]=headTag;
+       		}
+       		System.out.println("Size of output array="+index);
+       		for(int i=0;i<index;i++)
+       		{
+       			System.out.print(output[i]+" ");
+       		}
+       		//System.out.println("Just Noun Phrase:"+headTag);
+       		}
+       		System.out.println("Size of output array="+index);
+       		for(int i=0;i<index;i++)
+       		{
+       			System.out.print(output[i]+" ");
+       		}
+		}
+		
+		return null;
+	}
 	
 	public static String resolveHead(String ansPhrase) throws ParseException{
 		int count=0;
@@ -431,20 +904,24 @@ public class QuestionAsker {
 			e.printStackTrace();
 		}
 		Tree tree = StanfordParser.parseTree(ansPhrase);
+		System.out.println(tree);
 		tregexMatcher = tregexPatternMatchNounModifier.matcher(tree);
 		while (tregexMatcher.find()) {
 			
 			Tree nounTree = tregexMatcher.getNode("noun");
 			Tree npHeadTree = headFinder.determineHead(nounTree);
        		String headTag = TreeUtil.getLabel(npHeadTree);
-		    //System.out.println(npHeadTree.toString());
+       		
+       	
+       				
+		   //System.out.println(npHeadTree.toString());
 			count=countWords(headTag);
-			if(count==1)
-			{
-				//System.out.println("[Answer]: "+headTag+"\n\n");
+			
+			
+				
 				
 				return headTag;
-			}
+			
 			
 		
 		}
@@ -476,6 +953,7 @@ public class QuestionAsker {
 	//after POS tag merges all proper nouns together, it writes the proper noun list as file
 	//read the file and populate the nounPhrase Set
 	 public static boolean populateNounPhraseSet(){
+		 //System.out.println("VISHNU is in: populateNounPhraseSet()");
 	    	if(isNounPhraseSetPopulated==false){
 	    		System.out.println("populating nounPhrase Set");
 	    		BufferedReader in = null;

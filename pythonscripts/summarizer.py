@@ -2,6 +2,7 @@
 from __future__ import division
 import re
 import socket  
+import sys
 import random
 from tf import *
 
@@ -37,7 +38,7 @@ class SummaryTool(object):
             total_score += score
             #print score
 
-        # We normalize the result by the average number of words
+        
         return total_score
 
     # Format a sentence - remove all non-alphbetic chars from the sentence
@@ -189,17 +190,15 @@ def main():
 
     st = SummaryTool()
 
-    filepath = """/home/narain/Documents/inputs/KatherineHepburn.txt"""
+    filepath = sys.argv[1]
     content = st.readFile(filepath)
-    fo = open("fee.txt","wb")
-
+    fo = open("summarizer_output.txt","wb")
    # print content
     complete_summary = [] 
 
     para_summary = [] 
 
-    
- #Building the sentence dictionary
+     #Building the sentence dictionary
     sentences_dic = st.get_senteces_ranks(content)
     
    
@@ -238,9 +237,11 @@ def main():
             question = st.generate_questions(2)
             #st.question_printer(question)
             fo.write("Q:")
+            
             fo.write(question)
             fo.write("\n")
             for sentence in p:
+                
                 fo.write(sentence)
                 fo.write("\n ---------- \n")
         fo.close()
@@ -252,7 +253,9 @@ def main():
         print "One paragraph \n"
         complete_summary = st.get_distractors(content,sentences_dic,1)
         question = st.generate_questions(1)
-        st.question_printer(question)
+        fo.write("Q:")
+        fo.write(question)
+        fo.write("\n")
         for sentence in complete_summary:
              fo.write("Q:")
             fo.write(question)

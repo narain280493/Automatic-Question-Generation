@@ -62,7 +62,7 @@ class SummaryTool(object):
 
         # Calculate the intersection of every two sentences
         n = len(sentences)
-        print n
+       # print n
         values = [[0 for x in xrange(n)] for x in xrange(n)]
         for i in range(0, n):
             for j in range(0, n):

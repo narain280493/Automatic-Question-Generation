@@ -21,16 +21,16 @@ for item in json_data:
 st = SummaryTool()
 sentences_dic = st.get_senteces_ranks(content)
 summary = st.get_distractors(content,sentences_dic,1)
-#print summary
+print summary
 for p in paragraph:
     temp = p
     count = count + 1
     if temp.find(summary) != -1:
-    	print "Found the sentence in para -",count
+        print "Found the sentence in para -",count
     	start_time = timestamp[count-1]
     	end_time = timestamp[count]
     	clip(start_time,end_time)
-        print "Clipped."
+        #print "Clipped."
     	break
 
 

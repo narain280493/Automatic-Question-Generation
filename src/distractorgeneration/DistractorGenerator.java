@@ -56,7 +56,7 @@ public static List<List<String>> getNgrams(String[] wordList,String distractor,i
 	return ngramList;
 	   
 }
-public static void rankDistractor(String sentence,String ans,List<String> distractors){
+public static List<Distractor> rankDistractor(String sentence,String ans,List<String> distractors){
 	String[] wordList=sentence.split(" ");
 	int N;
 	int index=0;
@@ -67,7 +67,7 @@ public static void rankDistractor(String sentence,String ans,List<String> distra
 	}
 	if(index==wordList.length){
 		System.out.println("ansWord: "+ans+" is not found in the sentence: "+sentence);
-		return;
+		return null;
 	}
 	if(wordList.length>=5)
 		N=5;
@@ -101,11 +101,12 @@ public static void rankDistractor(String sentence,String ans,List<String> distra
 		distractorList.add(new Distractor(distractor,probabilitySum));
 	}
    Collections.sort(distractorList,new DistractorComparator());
-   System.out.println("Distractor Ranking :");
-   for(Distractor distractor:distractorList){
-	   System.out.println(distractor.distractorWord+" "+distractor.weight);
+  // System.out.println("Distractor Ranking :");
+  // for(Distractor distractor:distractorList){
+	//   System.out.println(distractor.distractorWord+" "+distractor.weight);
 	    
-   }
+   //}
+   return distractorList;
 	
 }
 public static List<String> getPOSTaggerDistractors (String fileName, String queryString) {

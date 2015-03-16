@@ -72,6 +72,7 @@ public class AnagramQuestion
 				
 			}
 			
+			
 			List<Topic> topicList=WikipediaMinerAPI.getTopics(Configuration.INPUT_TEXT);
 			int i=0;
 			System.out.println();

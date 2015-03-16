@@ -17,10 +17,13 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import com.aliasi.tokenizer.PorterStemmerFilterTokenizer;
+
 import Configuration.Configuration;
 import Utility.ThesaurusAPI;
 import Utility.VocabularyRanker;
 import Utility.WordNetPythonAPI;
+import edu.cmu.ark.PorterStemmer;
 import edu.cmu.ark.QuestionAsker;
 
 public class VocabularyQuestion {
@@ -230,6 +233,7 @@ public class VocabularyQuestion {
 		List<String> selectedVocabularyList=new ArrayList<String>();
 		List<List<String>> selectedVocabularySynonymList=new ArrayList<List<String>>();
 		int count=0;
+		//PorterStemmer stemmer=new PorterStemmer();
 		//System.out.println("WORD AND SST Tag");
 		System.out.println("FINAL LIST");
 		for(String word:rankedVocabularyList){
@@ -239,24 +243,63 @@ public class VocabularyQuestion {
 			}
 			else{
 				List<String> synonyms=WordNetPythonAPI.getSynonym(2, word, SSTTag);
-				System.out.println("SYNONYM :");
+				if(synonyms.size()==0)
+					continue;
+				System.out.print("WORD: "+word+" SYNONYM: ");
 				for(String syn:synonyms){
-					System.out.println(syn);
+					System.out.print(syn+";");
 				}
-				
+				System.out.println();
 				selectedVocabularySynonymList.add(synonyms);
 				count++;
 			}
-			if(count==4)
+			if(count==5)
 				break;
 		}
+		
 		for(int i=0;i<selectedVocabularyList.size();i++){
 			System.out.println("WORD "+selectedVocabularyList.get(i));
 			System.out.println("SYNONYMS "+selectedVocabularySynonymList.get(i).get(0));
 		}
 		
 	}
+	public static void generateMatchTheDefinitionQuestion(String inputFilePath){
+		List<String> vocabularyList=getVocabularies();
+		List<String> rankedVocabularyList=rankVocabularies(vocabularyList);
+		List<String> selectedVocabularyList=new ArrayList<String>();
+		List<List<String>> selectedVocabularyMeaningList=new ArrayList<List<String>>();
+		int count=0;
+		//PorterStemmer stemmer=new PorterStemmer();
+		//System.out.println("WORD AND SST Tag");
+		System.out.println("FINAL LIST");
+		for(String word:rankedVocabularyList){
+			String SSTTag=getSSTForGivenWord(inputFilePath, word);
+			if(SSTTag.equals("0")||SSTTag.equals("WORD_NOT_FOUND_IN_WORD_MAP")){
+				continue;
+			}
+			else{
+				List<String> meanings=WordNetPythonAPI.getDefinition(1, word, SSTTag);
+				if(meanings.size()==0)
+					continue;
+				System.out.print("WORD: "+word+" MEANING: ");
+				for(String syn:meanings){
+					System.out.print(syn+";");
+				}
+				System.out.println();
+				selectedVocabularyMeaningList.add(meanings);
+				count++;
+			}
+			if(count==5)
+				break;
+		}
 		
+		for(int i=0;i<selectedVocabularyList.size();i++){
+			System.out.println("WORD "+selectedVocabularyList.get(i));
+			System.out.println("SYNONYMS "+selectedVocabularyMeaningList.get(i).get(0));
+		}
+		
+	}
+	
 	/*	System.out.println("Match the following using set :"+selectedWords);
 		for(String str:selectedWords){
 			System.out.print(str +" - ");
@@ -279,6 +322,9 @@ public class VocabularyQuestion {
 	public static void main(String[] args) {
 		populateTagMap("/home/vishnu/workspace/QuestionGeneration/earthquake.txt");
 		generateMatchTheSynonymQuestion("/home/vishnu/workspace/QuestionGeneration/earthquake.txt");
+		generateMatchTheDefinitionQuestion("/home/vishnu/workspace/QuestionGeneration/earthquake.txt");
+		
+		
 	}
 
 }
