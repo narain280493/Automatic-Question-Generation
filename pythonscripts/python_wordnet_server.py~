@@ -1,10 +1,9 @@
 import sys
 from nltk.corpus import wordnet
-from bottle import route, run, template, error, abort, response
+from bottle import route, run, template, error, abort
 
 @error(404)
 def custom500(error):
-    response.status=200
     return "NO_RESPONSE"
 
 @route('/<choice>/<word>/<sst_tag>')

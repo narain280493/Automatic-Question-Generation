@@ -20,6 +20,7 @@ import java.util.Set;
 import com.aliasi.tokenizer.PorterStemmerFilterTokenizer;
 
 import Configuration.Configuration;
+import Utility.SuperSenseTagHelper;
 import Utility.ThesaurusAPI;
 import Utility.VocabularyRanker;
 import Utility.WordNetPythonAPI;
@@ -85,61 +86,6 @@ public class VocabularyQuestion {
 	      List<String> list = Arrays.asList(str.split(","));
 	   
 	      return list;
-	   }
-	public static String getSSTForGivenWord (String fileName, String queryString) {
-		 
-	    
-	      URL u;
-	      InputStream is = null;
-	      DataInputStream dis;
-	      String s;
-	      
-	      String str="";
-	      String urlString="";
-		try {
-			urlString = "http://localhost:8081/hitMe?queryString="+URLEncoder.encode(queryString,"UTF-8")+"&&type=2&&fileName="+URLEncoder.encode(fileName,"UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	      
-	      
-	      try {
-	 
-	             u = new URL(urlString);
-	               is = u.openStream();         // throws an IOException
-	 
-	       
-	         dis = new DataInputStream(new BufferedInputStream(is));
-	               while ((s = dis.readLine()) != null) {
-	                    str+=s;
-	         }
-	               
-	 
-	      } catch (MalformedURLException mue) {
-	 
-	         System.out.println("Ouch - a MalformedURLException happened.");
-	         mue.printStackTrace();
-	         System.exit(1);
-	 
-	      } catch (IOException ioe) {
-	 
-	         System.out.println("Oops- an IOException happened.");
-	         ioe.printStackTrace();
-	         System.exit(1);
-	 
-	      } finally {
-	 
-	       
-	         try {
-	            is.close();
-	         } catch (IOException ioe) {
-	            // just going to ignore this one
-	         }
-	 
-	      } // end of 'finally' clause
-	      
-	      return str;
 	   }
 	
 	public static void populateTagMap(String inputFilePath){
@@ -237,7 +183,7 @@ public class VocabularyQuestion {
 		//System.out.println("WORD AND SST Tag");
 		System.out.println("FINAL LIST");
 		for(String word:rankedVocabularyList){
-			String SSTTag=getSSTForGivenWord(inputFilePath, word);
+			String SSTTag=SuperSenseTagHelper.getSSTForGivenWord(inputFilePath, word);
 			if(SSTTag.equals("0")||SSTTag.equals("WORD_NOT_FOUND_IN_WORD_MAP")){
 				continue;
 			}
@@ -273,7 +219,7 @@ public class VocabularyQuestion {
 		//System.out.println("WORD AND SST Tag");
 		System.out.println("FINAL LIST");
 		for(String word:rankedVocabularyList){
-			String SSTTag=getSSTForGivenWord(inputFilePath, word);
+			String SSTTag=SuperSenseTagHelper.getSSTForGivenWord(inputFilePath, word);
 			if(SSTTag.equals("0")||SSTTag.equals("WORD_NOT_FOUND_IN_WORD_MAP")){
 				continue;
 			}

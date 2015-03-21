@@ -61,7 +61,7 @@ public static List<Distractor> rankDistractor(String sentence,String ans,List<St
 	int N;
 	int index=0;
 	for(String word:wordList){
-		if(word.equals(ans))
+		if(word.equalsIgnoreCase(ans))
 			break;
 		index++;
 	}

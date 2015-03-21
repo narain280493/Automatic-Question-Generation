@@ -1,79 +1,92 @@
 package Utility;
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
-import edu.cmu.ark.PorterStemmer;
 import Configuration.Configuration;
+import edu.cmu.ark.PorterStemmer;
 
 
 public class WordNetPythonAPI {
+	public static List<String> getResponse(String type,String word,String superSenseTag){
 
+	      URL u;
+	      InputStream is = null;
+	      DataInputStream dis;
+	      String s;
+	      
+	      String str="";
+	      String urlString="";
+		try {
+			urlString = "http://localhost:8030/"+URLEncoder.encode(type,"UTF-8")+"/"+URLEncoder.encode(word,"UTF-8")+"/"+URLEncoder.encode(superSenseTag,"UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	      
+	      
+	      try {
+	 
+	             u = new URL(urlString);
+	               is = u.openStream();         // throws an IOException
+	 
+	       
+	         dis = new DataInputStream(new BufferedInputStream(is));
+	               while ((s = dis.readLine()) != null) {
+	                    str+=s;
+	         }
+	               
+	 
+	      } catch (MalformedURLException mue) {
+	 
+	         System.out.println("Ouch - a MalformedURLException happened.");
+	         mue.printStackTrace();
+	         System.exit(1);
+	 
+	      } catch (IOException ioe) {
+	 
+	         System.out.println("Oops- an IOException happened.");
+	         ioe.printStackTrace();
+	         System.exit(1);
+	 
+	      } finally {
+	 
+	       
+	         try {
+	            is.close();
+	         } catch (IOException ioe) {
+	            // just going to ignore this one
+	         }
+	 
+	      } // end of 'finally' clause
+	      List<String> responseList=new ArrayList<String>();
+	      
+	      String[] list=str.split(";");
+	      for(String responseWord:list){
+	    	  responseList.add(responseWord);
+	      }
+	      responseList=removeDuplicates(responseList, word);
+	      return responseList;
+	      
+	   }
 	public static void main(String[] args) {
 		String word="good";
 		String tag ="adj.all";
-		int choice = 2;
-		switch(choice)
-		{
-		case 1: List<String> list= new ArrayList<String>();
-		
-				
-				list= getDefinition(1, word, tag);
-				if(list.isEmpty())
-					System.out.println("No meanings found for the word.");
-				else{
-				System.out.println("Word - Meaning");
-				// for(String k: list.keySet())
-				 {
-				//	 System.out.println(k+"-"+list.get(k));
-				 }
-				}
-				break;
-		case 2: 
-				List<String> synonyms = new ArrayList();
-		
-				synonyms=getSynonym(2,word,tag);
-				if(synonyms.isEmpty())
-					System.out.println("No synonyms found for the word.");
-				else {
-				System.out.println("Synonyms:");
-				for(int i=0;i<synonyms.size();i++)
-				{
-					System.out.println(synonyms.get(i));
-					
-				}
-				}
-				break;
-				
-		case 3:
-				List<String> antonyms = new ArrayList();
-				antonyms= getAntonyms(3,word,tag);
-				if(antonyms.isEmpty())
-					System.out.println("No antonyms found for the word.");
-				else{
-				System.out.println("Antonyms:");
-				for(int i=0;i<antonyms.size();i++)
-				{
-					System.out.println(antonyms.get(i));
-					
-				}
-				}
-				break;
-			
+		List<String>result=getResponse("antonym", word, tag);
+		for(String str:result){
+			System.out.println(str);
 		}
-		
-		 
-		
 	}
 	
 	public static List<String> getDefinition(int choice, String word, String tag)
@@ -148,6 +161,8 @@ public class WordNetPythonAPI {
 		return antonyms;
 		
 	}
+	//removes duplicates
+	//removes stem words
 	public static List<String> removeDuplicates(List<String> words,String word)
 	{
 		String rootWord=PorterStemmer.getInstance().stem(word);

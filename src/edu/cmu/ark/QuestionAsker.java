@@ -97,22 +97,24 @@ public class QuestionAsker {
 		populateNounPhraseSet();
 		//stage 1 SuperSenseTagger
 		List<String>sstList=DistractorGenerator.getSSTTaggerDistractors(Configuration.INPUT_FILE_PATH+INPUT_FILE_NAME, answerPhrase);
-		sstList=DistractorFilter.removeAnswerPhraseWordsFromDistractorList(originalAnsPhrase, sstList);
-		System.out.println("No. of SST Distractors found :"+(sstList.size()-1));
-		if(sstList.size()>=2){
-			distractorCount+=(sstList.size()-1);
-		}
-		
-		
-		//stage 2 POSTagger
-		System.out.println("No. of POS Distractors found :"+(posList.size()-1));
 
-		 
 		posDistractorList.addAll(posList);
 		sstDistractorList.addAll(sstList);
 		//remove "yes" or "no" which is the first element in the sst and pos list 
 		posDistractorList.remove(0);
 		sstDistractorList.remove(0);
+		
+		sstDistractorList=DistractorFilter.applyFiltersToDistractorList(answerPhrase,originalAnsPhrase, sstDistractorList);
+		System.out.println("No. of SST Distractors found :"+(sstDistractorList.size()));
+		if(sstDistractorList.size()>=2){
+			distractorCount+=(sstDistractorList.size());
+		}
+		
+		
+		//stage 2 POSTagger
+		System.out.println("No. of POS Distractors found :"+(posDistractorList.size()));
+
+		 
 		//Distractor ranking
 		//substitute the answer phrase with the distractor and check the probability of N-gram using
 		//microsoft bing api 
@@ -138,7 +140,7 @@ public class QuestionAsker {
 		
 		}
 		if(distractorCount<3){
-			 posDistractorList=DistractorFilter.removeAnswerPhraseWordsFromDistractorList(originalAnsPhrase, posDistractorList);
+			 posDistractorList=DistractorFilter.applyFiltersToDistractorList(answerPhrase,originalAnsPhrase, posDistractorList);
 			 posDistractorList=DistractorFilter.removeSSTDistractorsFromPOSDistractorList(posDistractorList,sstDistractorList);
 			 if(isAnsPhraseProperNoun(answerPhrase)){
 					System.out.println("POS distractors: ");
@@ -521,6 +523,7 @@ public class QuestionAsker {
 							continue;
 						}
 						INPUT_FILE_NAME=files[0];
+						Configuration.INPUT_FILE_NAME=files[0];
 						FileReader in = new FileReader(files[0]);
 					    BufferedReader br = new BufferedReader(in);	
 				
