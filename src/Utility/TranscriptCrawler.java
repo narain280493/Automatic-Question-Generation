@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,25 +54,31 @@ public class TranscriptCrawler {
 			BufferedWriter bw = new BufferedWriter(fw);
 			bw.write(jsonArray.toJSONString());
 			bw.close();
- 
+			return "Write Success";
 			//System.out.println("Done");
  
 		} catch (IOException e) {
 			e.printStackTrace();
+			
 		}
 
 		//System.out.println(transcript.length());
-		return transcript;
+		return "Write Failure";
 		
 	}
 	
 
 	public static void main(String[] args) {
-		getTranscript("http://www.ted.com/talks/russell_foster_why_do_we_sleep/transcript?language=en");
+		ArrayList<String> summaryPara =new ArrayList<String>();
+		getTranscript("http://www.ted.com/talks/jaap_de_roode_how_butterflies_self_medicate/transcript?language=en");
 		VideoClipper vc=new VideoClipper();
-		vc.ClipVideo();
-		VideoPlayer vp =new VideoPlayer();
-		vp.play();
+		summaryPara=vc.ClipVideo();
+		for(String sentence:summaryPara)
+		{
+			System.out.println(sentence);
+		}
+	//	VideoPlayer vp =new VideoPlayer();
+		//vp.play();
 	}
 	
 }

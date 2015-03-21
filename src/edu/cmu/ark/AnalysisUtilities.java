@@ -245,6 +245,7 @@ public class AnalysisUtilities {
 
 	
 	public ParseResult parseSentence(String sentence) {
+		System.out.println("Inside AnalysisUtilities - ParseSentence");
 		String result = "";
 		//System.err.println(sentence);
 		//see if a parser socket server is available
@@ -283,6 +284,7 @@ public class AnalysisUtilities {
 			client.close();
 			
 			if(parse == null){
+				System.out.println("Parse is null");
 				parse = readTreeFromString("(ROOT (. .))");
 				parseScore = -99999.0;
 			}
@@ -301,10 +303,12 @@ public class AnalysisUtilities {
 		//if socket server not available, then use a local parser object
 		if(parser == null){
 			try {
+				System.out.println("Using a local parser object.");
 				Options op = new Options();
 				String serializedInputFileOrUrl = GlobalProperties.getProperties().getProperty("parserGrammarFile", "config"+File.separator+"englishFactored.ser.gz");
 				parser = new LexicalizedParser(serializedInputFileOrUrl, op);
 				int maxLength = new Integer(GlobalProperties.getProperties().getProperty("parserMaxLength", "40")).intValue();
+				System.out.println("MaxLength-"+maxLength);
 				parser.setMaxLength(maxLength);
 				parser.setOptionFlags("-outputFormat", "oneline");
 			} catch (Exception e){
@@ -313,19 +317,22 @@ public class AnalysisUtilities {
 		}
 
 		try{
+			System.out.println("Result of parser.parse(sentence)"+parser.parse(sentence));
 			if(parser.parse(sentence)){
 				parse = parser.getBestParse();
-				
+				System.out.println("This fucking block was executed");
 				//remove all the parent annotations (this is a hacky way to do it)
 				String ps = parse.toString().replaceAll("\\[[^\\]]+/[^\\]]+\\]", "");
+				System.out.println("ps="+ps);
 				parse = AnalysisUtilities.getInstance().readTreeFromString(ps);
-				
+				System.out.println("Parse Result:"+parse);
 				parseScore = parser.getPCFGScore();
 				return new ParseResult(true, parse, parseScore);
 			}
 		}catch(Exception e){
+			System.out.println("Exception-"+e);
 		}
-
+		System.out.println("This fucking block was executed-Exception"); //this is getting executed  :(
 		parse = readTreeFromString("(ROOT (. .))");
         parseScore = -99999.0;
         return new ParseResult(false, parse, parseScore);
