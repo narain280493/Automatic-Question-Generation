@@ -7,17 +7,19 @@ public class Tester {
 
 
 		 QuestionAsker qa = new QuestionAsker();
-		// System.out.println(qa.HeadWordResolver("to Abraham Lincoln")); //correct
-		//System.out.println(qa.HeadWordResolver("an excellent farmer,carpenter or engineer")); //correct 
-		// System.out.println(qa.HeadWordResolver("a teacher, counselor, coach, or after-school program director")); // incorrect
-		// System.out.println(qa.HeadWordResolver("Narain Sharma and Thomas Lincoln")); //correct
-		 //System.out.println(qa.HeadWordResolver(" America and Germany")); //correct
-		// System.out.println(qa.HeadWordResolver("to Lincolns and Tonys"));
-	//	 System.out.println(qa.HeadWordResolver("to excellent men"));
-		 //System.out.println(qa.HeadWordResolver(""));
+		
+		 
 		// String[] output=new String[50];
-		String[] output=qa.HeadWordResolver("The point I'm trying to make is that when you're asleep, this thing doesn't shut down.");
-		System.out.println("\nOutput:");
+		// String output =qa.HeadWordResolver("to Abraham Lincoln"); //correct
+		//String[] output=qa.HeadWordResolver("John, Vishnu and Adi");//fails for these type of cases. //need NER to resolve these.
+	//	 String[] output=qa.HeadWordResolver("an excellent farmer,carpenter or engineer"); //correct 
+	//	 String[] output=qa.HeadWordResolver("a teacher, counselor, coach, or after-school program director");//correct
+	//	 String [] output=qa.HeadWordResolver("Americans, Germans and French"); //correct
+//		 String[] output=qa.HeadWordResolver("America and Germany"); //correct
+		// String[] output=qa.HeadWordResolver("to Lincolns and Tonys"); //correct
+		// String[] output=qa.HeadWordResolver("to excellent men"); //correct
+		 String [] output=qa.HeadWordResolver("from Narain Sharma and Vishnu Jayvel");
+		 System.out.println("\nOutput:");
 		 for (String word: output) {
 			 	if(word!=null)
 	            System.out.println(word);

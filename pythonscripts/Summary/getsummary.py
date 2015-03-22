@@ -8,6 +8,7 @@ timestamp = []
 paragraph = []
 videoQuestionInput = []
 content = " "
+
 count =0
 inputText =" "
 
@@ -19,6 +20,7 @@ for item in json_data:
 		paragraph.append(value)
 		timestamp.append(attribute)
 		content = content + " "+ value
+
 
 #print "Before processing: \n",content
 content = contractions(content)
