@@ -7,7 +7,7 @@ public class Tester {
 
 
 		 QuestionAsker qa = new QuestionAsker();
-		
+		qa.getQuestionsForSentence("My name is Narain.");
 		 
 		// String[] output=new String[50];
 		// String output =qa.HeadWordResolver("to Abraham Lincoln"); //correct
@@ -18,12 +18,14 @@ public class Tester {
 //		 String[] output=qa.HeadWordResolver("America and Germany"); //correct
 		// String[] output=qa.HeadWordResolver("to Lincolns and Tonys"); //correct
 		// String[] output=qa.HeadWordResolver("to excellent men"); //correct
-		 String [] output=qa.HeadWordResolver("from Narain Sharma and Vishnu Jayvel");
+	
+		 
+		 /*String [] output=qa.HeadWordResolver("from Narain Sharma and Vishnu Jayvel");
 		 System.out.println("\nOutput:");
 		 for (String word: output) {
 			 	if(word!=null)
 	            System.out.println(word);
-	        }
+	        }*/
 	//	System.out.println(output[4]);
 		
 		

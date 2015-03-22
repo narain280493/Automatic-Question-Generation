@@ -210,21 +210,22 @@ public class QuestionAsker {
 		parsed = AnalysisUtilities.getInstance().parseSentence(sentence).parse;
 		inputTrees.add(parsed);
 		
-	
-		System.out.println("Parse Tree-"+parsed);
 		//step 1 transformations
 		List<Question> transformationOutput = trans.transform(inputTrees);
-		System.out.println("Step 1");
+		
+		for(Question q:transformationOutput)
+		{
+			System.out.println(q);
+		}
 		//step 2 question transducer
 		for(Question t: transformationOutput){
-			if(GlobalProperties.getDebug()) System.err.println("Stage 2 Input: "+t.getIntermediateTree().yield().toString());
+		//	if(GlobalProperties.getDebug()) System.err.println("Stage 2 Input: "+t.getIntermediateTree().yield().toString());
 			qt.generateQuestionsFromParse(t);
 			outputQuestionList.addAll(qt.getQuestions());
-		}			
-		
+		}	
 		//remove duplicates
 		QuestionTransducer.removeDuplicateQuestions(outputQuestionList);
-		System.out.println("step2");
+		
 		//step 3 ranking
 		if(qr != null){
 			qr.scoreGivenQuestions(outputQuestionList);
@@ -232,12 +233,19 @@ public class QuestionAsker {
 			QuestionRanker.adjustScores(outputQuestionList, inputTrees, avoidFreqWords, preferWH, downweightPronouns, doStemming);
 			QuestionRanker.sortQuestions(outputQuestionList, false);
 		}
-		System.out.println("step3");
+		
 		//now print the questions
 		
+		//now print the questions
+		
+		int questionCount=1;
+		List<String> reasoningQuestionList=new ArrayList<String>();
 		for(Question question: outputQuestionList){
 			String ansPhrase="";
 			String originalAnsPhrase="";
+			
+			Tree ansTree = question.getAnswerPhraseTree();
+			
 				
 			if(question.getTree().getLeaves().size() > maxLength){
 				continue;
@@ -245,12 +253,22 @@ public class QuestionAsker {
 			if(justWH && question.getFeatureValue("whQuestion") != 1.0){
 				continue;
 			}
+			System.out.println();
+			System.out.println("=====================================================================================================");
+			System.out.println();
+			System.out.println("QuestionCount: "+questionCount);
+			questionCount++;
 			System.out.println("Question :"+question.yield());
 			System.out.println("Score :"+question.getScore());
-			Tree ansTree = question.getAnswerPhraseTree();
+			//if ansTree is null, there is no answer phrase.So don't call distractor generator
 			if(ansTree != null){
 				ansPhrase = AnalysisUtilities.getCleanedUpYield(question.getAnswerPhraseTree());
 				originalAnsPhrase=ansPhrase;
+				//TODO: if ansPhrase is PRP(pronoun) dont call distractorGenerator
+				if(ansPhrase.equalsIgnoreCase("it")||ansPhrase.equalsIgnoreCase("they")){
+					//TODO: logic has to be done to resolve "it" and "they"
+					continue;
+				}
 				System.out.println("Answer Phrase detected :"+ansPhrase);
 				if (!isAnsPhraseProperNoun(ansPhrase)&&(countWords(ansPhrase)>=2)) {
 					System.out.println("Resolving answerphrase to a single word...");
@@ -272,14 +290,24 @@ public class QuestionAsker {
 				
 			}
 			else{
+				System.out.println("Answer Phrase :"+"Yes");
 				String ansSentence = question.getSourceTree().yield().toString();
 				System.out.println("Answer Sentence :"+ansSentence);
-				
+				String questionSentence=question.yield();
+				Character firstChar=questionSentence.charAt(0);
+				firstChar=Character.toLowerCase(firstChar);
+				StringBuilder qS=new StringBuilder(questionSentence);
+				qS.setCharAt(0,firstChar);
+				reasoningQuestionList.add("Why "+qS);
 			}
 			
 		}
+		System.out.println("Reasoning questions: ");
+		for(String reasoningQuestion:reasoningQuestionList){
+			System.out.println(reasoningQuestion);
+		}
 
-		System.out.println("qg over");
+		//System.out.println("qg over");
 	
 	}
 	/**
@@ -287,156 +315,7 @@ public class QuestionAsker {
 	 * @return 
 	 * @throws ParseException 
 	 */
-	/*public void getQues(String summary)
-	{
-		QuestionTransducer qt = new QuestionTransducer();
-		InitialTransformationStep trans = new InitialTransformationStep();
-		
-		
-		qt.setAvoidPronounsAndDemonstratives(false);
-		
-		//pre-load
-		AnalysisUtilities.getInstance();
-		
-		String buf;
-		Tree parsed;
-		boolean printVerbose = true;//setting printVerbose true always
-		String modelPath = "models/linear-regression-ranker-reg500.ser.gz";
-		
-		List<Question> outputQuestionList = new ArrayList<Question>();
-		boolean preferWH = false;
-		boolean doNonPronounNPC = false;
-		boolean doPronounNPC = true;
-		Integer maxLength = 1000;
-		boolean downweightPronouns = false;
-		boolean avoidFreqWords = false;
-		boolean dropPro = true;
-		boolean justWH = false;
-		
-		
-				GlobalProperties.setDebug(true);
-			
-		qt.setAvoidPronounsAndDemonstratives(dropPro);
-		trans.setDoPronounNPC(doPronounNPC);
-		trans.setDoNonPronounNPC(doNonPronounNPC);
-		
-		if(modelPath != null){
-			System.err.println("Loading question ranking models from "+modelPath+"...");
-			qr = new QuestionRanker();
-			qr.loadModel(modelPath);
-		}
-		
-		try{
-			
-				if(GlobalProperties.getDebug()) System.err.println("\nInput TextFile:");
-				String doc;
-	
-				String query = summary;
-				System.out.println("Query read is :"+query);
-				
-				outputQuestionList.clear();
-				
-				
-				
-				
-				//iterate over each segmented sentence and generate questions
-				ArrayList<Tree> inputTrees =new ArrayList<Tree>();
-				
-				
-					parsed = AnalysisUtilities.getInstance().parseSentence(summary).parse;
-					inputTrees.add(parsed);
-				
-				
-			//	if(GlobalProperties.getDebug()) System.err.println("Seconds Elapsed Parsing:\t"+((System.currentTimeMillis()-startTime)/1000.0));
-				
-				//step 1 transformations
-				Question transformationOutput = (Question) trans.transform(inputTrees);
-				
-				
-				//	if(GlobalProperties.getDebug()) System.err.println("Stage 2 Input: "+t.getIntermediateTree().yield().toString());
-					qt.generateQuestionsFromParse(transformationOutput);
-					outputQuestionList.addAll(qt.getQuestions());
-							
-				
-				//remove duplicates
-				QuestionTransducer.removeDuplicateQuestions(outputQuestionList);
-				
-				//step 3 ranking
-				if(qr != null){
-					qr.scoreGivenQuestions(outputQuestionList);
-					boolean doStemming = true;
-					QuestionRanker.adjustScores(outputQuestionList, inputTrees, avoidFreqWords, preferWH, downweightPronouns, doStemming);
-					QuestionRanker.sortQuestions(outputQuestionList, false);
-				}
-				
-				//now print the questions
-				
-				int questionCount=1;
-				for(Question question: outputQuestionList){
-					String ansPhrase="";
-					String originalAnsPhrase="";
-						
-					if(question.getTree().getLeaves().size() > maxLength){
-						continue;
-					}
-					if(justWH && question.getFeatureValue("whQuestion") != 1.0){
-						continue;
-					}
-					System.out.println();
-					System.out.println("=====================================================================================================");
-					System.out.println();
-					System.out.println("QuestionCount: "+questionCount);
-					questionCount++;
-					System.out.println("Question :"+question.yield());
-					System.out.println("Score :"+question.getScore());
-					Tree ansTree = question.getAnswerPhraseTree();
-					if(ansTree != null){
-						ansPhrase = AnalysisUtilities.getCleanedUpYield(question.getAnswerPhraseTree());
-						System.out.println("Answer Phrase detected :"+ansPhrase);
-						if (!isAnsPhraseProperNoun(ansPhrase)&&(countWords(ansPhrase)>=2)) {
-							System.out.println("Resolving answerphrase to a single word...");
-							String headWord=null;
-							try {
-								headWord = resolveHead(ansPhrase);
-							} catch (ParseException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-							if(headWord!=null){
-								ansPhrase=headWord;
-							}
-						}
-						System.out.println("Answer Phrase :"+ansPhrase);
-						String ansSentence = question.getSourceTree().yield().toString();
-						System.out.println("Answer Sentence :"+ansSentence);
-						generateDistractor(INPUT_FILE_NAME, originalAnsPhrase, ansPhrase, ansSentence);
-						
-					}
-					else{
-				
-						//System.out.println("VISHNU yes/no");
-						System.out.println("Answer Phrase :"+"Yes");
-						
-						String ansSentence = question.getSourceTree().yield().toString();
-						System.out.println("Answer Sentence :"+ansSentence);
-						
-					}
-					//System.out.println("Question type : "+question.);
-					//if(printVerbose) 
-					
-				}
-	
-			
-			
-
-			//	VocabularyQuestion.populateTagMap();
-			//parent while block ends
-		}//try block ends
-		catch(Exception e){
-			e.printStackTrace();
-		}
-	}*/
-	public static void main(String [] args) throws ParseException {
+		public static void main(String [] args) throws ParseException {
 		
 		QuestionTransducer qt = new QuestionTransducer();
 		InitialTransformationStep trans = new InitialTransformationStep();
@@ -1044,6 +923,7 @@ public class QuestionAsker {
 	
 	public static String resolveHead(String ansPhrase) throws ParseException{
 		int count=0;
+		System.out.println("Inside QuestionAsker");
 		String tregexMatchNounModifier = "NP=noun";
 		TregexPattern tregexPatternMatchNounModifier;
 		TregexMatcher tregexMatcher;
@@ -1056,7 +936,7 @@ public class QuestionAsker {
 			e.printStackTrace();
 		}
 		Tree tree = StanfordParser.parseTree(ansPhrase);
-		System.out.println(tree);
+		System.out.println("Parse Tree(Ans Phrase)"+tree);
 		tregexMatcher = tregexPatternMatchNounModifier.matcher(tree);
 		while (tregexMatcher.find()) {
 			
