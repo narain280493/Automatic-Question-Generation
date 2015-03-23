@@ -6,6 +6,8 @@ The following 1) and 2) can be started via eclipse
 
 The following 3) should be started from the command line
 3) Python wordnet server running in port 8030
+U need bottle framework for that
+Install the latest stable release with "sudo pip install bottle "," easy_install -U bottle" 
 Run it using the command
 :~/workspace/QuestionGeneration$ cd pythonscripts/
 :~/workspace/QuestionGeneration/pythonscripts$ python python_wordnet_server.py
