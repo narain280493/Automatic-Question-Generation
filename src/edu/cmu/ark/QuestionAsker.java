@@ -970,6 +970,7 @@ public class QuestionAsker {
 		    tregexPatternMatchNounPhraseMatcher.find();
 			
 			Tree nounTree = tregexPatternMatchNounPhraseMatcher.getNode("nounphrase");
+			//Vishnu made changes here
 			if(nounTree==null)
 					return null;
 			tregexPatternMatchProperNounMatcher = tregexPatternMatchProperNounModifier.matcher(nounTree);
