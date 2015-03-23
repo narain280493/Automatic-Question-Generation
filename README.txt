@@ -1,3 +1,25 @@
+-------------------------------------------------------------------------------------------------------
+To make the distractor generation to work, you have to start the following servers
+The following 1) and 2) can be started via eclipse
+1) POSTagger sever running in  port 8080
+2) Supersense tagger running in port 8081
+
+The following 3) should be started from the command line
+3) Python wordnet server running in port 8030
+Run it using the command
+:~/workspace/QuestionGeneration$ cd pythonscripts/
+:~/workspace/QuestionGeneration/pythonscripts$ python python_wordnet_server.py
+
+******
+
+To make the wikipedia topic extraction to work
+You need nodejs and related dependencies
+
+and then run the test.js file
+using command : phantomjs test.js
+
+******
+-------------------------------------------------------------------------------------------------------
 Question Generation via Overgenerating Transformations and Ranking
 Michael Heilman and Noah A. Smith
 

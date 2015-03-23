@@ -3,23 +3,23 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="question-generation.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/home/narain/workspace/questiongeneration/lib/gson-1.0.jar"/>
-	<classpathentry kind="lib" path="/home/narain/workspace/questiongeneration/lib/log4j.jar"/>
-	<classpathentry kind="lib" path="/home/narain/workspace/questiongeneration/lib/lingpipe.jar"/>
-	<classpathentry kind="lib" path="/home/narain/workspace/questiongeneration/lib/jwnl.jar"/>
-	<classpathentry kind="lib" path="/home/narain/workspace/questiongeneration/lib/junit-3.8.2.jar"/>
-	<classpathentry kind="lib" path="/home/narain/workspace/questiongeneration/lib/jsoup-1.8.1.jar"/>
-	<classpathentry kind="lib" path="/home/narain/workspace/questiongeneration/lib/json-simple-1.1.1.jar"/>
-	<classpathentry kind="lib" path="/home/narain/workspace/questiongeneration/lib/javelin.jar"/>
-	<classpathentry kind="lib" path="/home/narain/workspace/questiongeneration/lib/fontbox-1.8.5.jar"/>
-	<classpathentry kind="lib" path="/home/narain/workspace/questiongeneration/lib/commons-logging.jar"/>
-	<classpathentry kind="lib" path="/home/narain/workspace/questiongeneration/lib/commons-lang-2.4.jar"/>
-	<classpathentry kind="lib" path="/home/narain/workspace/questiongeneration/lib/arkref.jar"/>
-	<classpathentry kind="lib" path="/home/narain/workspace/questiongeneration/lib/apache-logging-log4j.jar.zip"/>
-	<classpathentry kind="lib" path="/home/narain/workspace/questiongeneration/lib/weka-3-6.jar"/>
-	<classpathentry kind="lib" path="/home/narain/workspace/questiongeneration/lib/supersense-tagger.jar"/>
-	<classpathentry kind="lib" path="/home/narain/workspace/questiongeneration/lib/stanford-parser.jar"/>
-	<classpathentry kind="lib" path="/home/narain/workspace/questiongeneration/lib/stanford-parser-2008-10-26.jar"/>
-	<classpathentry kind="lib" path="/home/narain/workspace/questiongeneration/lib/pdfbox-1.8.8.jar"/>
+	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration/lib/gson-1.0.jar"/>
+	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration/lib/apache-logging-log4j.jar.zip"/>
+	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration/lib/jsoup-1.8.1.jar"/>
+	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration/lib/fontbox-1.8.5.jar"/>
+	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration/lib/pdfbox-1.8.8.jar"/>
+	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration/lib/json-simple-1.1.1.jar"/>
+	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration/lib/stanford-parser-2008-10-26.jar"/>
+	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration/lib/arkref.jar"/>
+	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration/lib/commons-logging.jar"/>
+	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration/lib/commons-lang-2.4.jar"/>
+	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration/lib/junit-3.8.2.jar"/>
+	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration/lib/jwnl.jar"/>
+	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration/lib/weka-3-6.jar"/>
+	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration/lib/supersense-tagger.jar"/>
+	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration/lib/stanford-parser.jar"/>
+	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration/lib/log4j.jar"/>
+	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration/lib/lingpipe.jar"/>
+	<classpathentry kind="lib" path="/home/vishnu/workspace/QuestionGeneration/lib/javelin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
