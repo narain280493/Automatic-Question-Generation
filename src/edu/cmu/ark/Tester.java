@@ -1,5 +1,7 @@
 package edu.cmu.ark;
 
+import java.util.List;
+
 import edu.stanford.nlp.trees.tregex.ParseException;
 
 public class Tester {
@@ -18,7 +20,7 @@ public class Tester {
 //		 String[] output=qa.HeadWordResolver("America and Germany"); //correct
 		// String[] output=qa.HeadWordResolver("to Lincolns and Tonys"); //correct
 		// String[] output=qa.HeadWordResolver("to excellent men"); //correct
-		 String [] output=qa.HeadWordResolver("from Narain Sharma and Vishnu Jayvel");
+		 List<String>  output=qa.HeadWordResolver("problems with low self-esteem and depression");
 		 System.out.println("\nOutput:");
 		 for (String word: output) {
 			 	if(word!=null)

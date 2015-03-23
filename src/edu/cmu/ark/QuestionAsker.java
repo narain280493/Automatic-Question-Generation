@@ -35,6 +35,7 @@ import java.io.*;
 //import java.text.NumberFormat;
 import java.util.*;
 
+import Utility.MiscellaneousHelper;
 import ComprehensionQuestionGeneration.VocabularyQuestion;
 import Configuration.Configuration;
 import distractorgeneration.Distractor;
@@ -182,7 +183,7 @@ public class QuestionAsker {
 		}
 		
 	}
-	public static  void getQuestionsForSentence(String sentence){
+	/*public static  void getQuestionsForSentence(String sentence){
 		
 		System.out.println("Summary:"+sentence);
 		String modelPath = "models/linear-regression-ranker-reg500.ser.gz";
@@ -256,7 +257,17 @@ public class QuestionAsker {
 					System.out.println("Resolving answerphrase to a single word...");
 					String headWord=null;
 					try {
-						headWord = resolveHead(ansPhrase);
+						//headWord = resolveHead(ansPhrase);
+						//get all possible headwords(nounphrases)
+						String[] possibleHeadWords = HeadWordResolver(originalAnsPhrase);
+						if(possibleHeadWords!=null && possibleHeadWords.length>=1){
+							int rand=MiscellaneousHelper.getRandomNumber(0, possibleHeadWords.length-1);
+							headWord=possibleHeadWords[rand];
+						}
+						else{
+							System.out.println("ERROR :HeadWordResolver is not returning any valid headwords for given answerphrase: "+originalAnsPhrase);
+						}
+					
 					} catch (ParseException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -282,6 +293,7 @@ public class QuestionAsker {
 		System.out.println("qg over");
 	
 	}
+	*/
 	/**
 	 * @param args
 	 * @return 
@@ -636,7 +648,20 @@ public class QuestionAsker {
 							System.out.println("Resolving answerphrase to a single word...");
 							String headWord=null;
 							try {
-								headWord = resolveHead(ansPhrase);
+								//headWord = resolveHead(ansPhrase);
+							
+								List<String> possibleHeadWords = HeadWordResolver(originalAnsPhrase);
+								
+								if(possibleHeadWords!=null && possibleHeadWords.size()>=1){
+									System.out.println("Possible headwords");
+									for(String str:possibleHeadWords)
+											System.out.println(str);
+									int rand=MiscellaneousHelper.getRandomNumber(0, possibleHeadWords.size()-1);
+									headWord=possibleHeadWords.get(rand);
+								}
+								else{
+									System.out.println("ERROR :HeadWordResolver is not returning any valid headwords for given answerphrase: "+originalAnsPhrase);
+								}
 							} catch (ParseException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -691,7 +716,7 @@ public class QuestionAsker {
 		}
 		System.out.println();
 	}
-	public static String[] HeadWordResolver(String ansPhrase) throws ParseException{
+	public static List<String> HeadWordResolver(String ansPhrase) throws ParseException{
 		
 		int index=0;
 		int pncount=0;
@@ -756,7 +781,7 @@ public class QuestionAsker {
 		if(ansPhrase==""||ansPhrase==null)
 		{
 			output[0]="Nope";
-			return output;
+			return null;
 		}
 		if(ansPhrase!=""){
 		Tree tree = StanfordParser.parseTree(ansPhrase);
@@ -945,7 +970,9 @@ public class QuestionAsker {
 		    tregexPatternMatchNounPhraseMatcher.find();
 			
 			Tree nounTree = tregexPatternMatchNounPhraseMatcher.getNode("nounphrase");
-       		tregexPatternMatchProperNounMatcher = tregexPatternMatchProperNounModifier.matcher(nounTree);
+			if(nounTree==null)
+					return null;
+			tregexPatternMatchProperNounMatcher = tregexPatternMatchProperNounModifier.matcher(nounTree);
        		tregexPatternMatchProperNounPluralMatcher = tregexPatternMatchProperNounPluralModifier.matcher(nounTree);
        		//to check whether NNP are present.
        		while(tregexPatternMatchProperNounMatcher.find()||tregexPatternMatchProperNounPluralMatcher.find())
@@ -1038,8 +1065,14 @@ public class QuestionAsker {
 	
 
 		}
-		
-		return output;
+		List<String> headWordList = new ArrayList<String>();
+		for(String word:output){
+			if(word != null){
+				headWordList.add(word);
+			}
+			
+		}
+		return headWordList;
 	}
 	
 	public static String resolveHead(String ansPhrase) throws ParseException{
