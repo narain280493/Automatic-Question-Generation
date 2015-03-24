@@ -35,6 +35,7 @@ import java.io.*;
 //import java.text.NumberFormat;
 import java.util.*;
 
+import NattyParser.DateDistractor;
 import Utility.MiscellaneousHelper;
 import ComprehensionQuestionGeneration.VocabularyQuestion;
 import Configuration.Configuration;
@@ -634,7 +635,26 @@ public class QuestionAsker {
 					questionCount++;
 					System.out.println("Question :"+question.yield());
 					System.out.println("Score :"+question.getScore());
+					//Date distractor generation code begins
+					if(question.yield().substring(0,4).equalsIgnoreCase("When")){
+						System.out.println("Date distractor generation begins ");
+						List<String> distractorList = DateDistractor.getDistractors(AnalysisUtilities.getCleanedUpYield(question.getAnswerPhraseTree()));
+						int len=1;
+						if(distractorList.size()==3){
+							System.out.println("Multiple choices:");
+							for(String str:distractorList){
+								System.out.print(len+")"+str+"\t");
+							}
+							System.out.println();
+						}
+						else{
+							System.out.println("Distractors cannot be created");
+						}
+						continue;
+					}
+					//Date distractor generation code ends 
 					//if ansTree is null, there is no answer phrase.So don't call distractor generator
+					
 					if(ansTree != null){
 						ansPhrase = AnalysisUtilities.getCleanedUpYield(question.getAnswerPhraseTree());
 						originalAnsPhrase=ansPhrase;

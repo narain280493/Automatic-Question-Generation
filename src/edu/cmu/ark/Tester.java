@@ -20,12 +20,13 @@ public class Tester {
 //		 String[] output=qa.HeadWordResolver("America and Germany"); //correct
 		// String[] output=qa.HeadWordResolver("to Lincolns and Tonys"); //correct
 		// String[] output=qa.HeadWordResolver("to excellent men"); //correct
-		 List<String>  output=qa.HeadWordResolver("problems with low self-esteem and depression");
+		 List<String>  output=qa.HeadWordResolver("February 12");
 		 System.out.println("\nOutput:");
 		 for (String word: output) {
 			 	if(word!=null)
 	            System.out.println(word);
 	        }
+		 System.out.println("When was ".substring(0,3));
 	//	System.out.println(output[4]);
 		
 		
