@@ -11,6 +11,7 @@ public class WikipediaMinerAPIDriver {
 		String string=sc.nextLine();
 		System.out.println("Detected topics and their probability");
 		List<Topic> list=WikipediaMinerAPI.getTopics(string);
+		System.out.println("Number of topics found :"+list.size());
 		for(Topic topic:list){
 			System.out.println(topic.topicName+" "+topic.probability);
 			

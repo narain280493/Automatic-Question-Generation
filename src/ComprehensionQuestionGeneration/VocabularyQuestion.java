@@ -266,7 +266,7 @@ public class VocabularyQuestion {
 	*/
 	
 	public static void main(String[] args) {
-		String fileName="earthquake.txt";
+		String fileName="input.txt";
 		populateTagMap("/home/vishnu/workspace/QuestionGeneration/"+fileName);
 		generateMatchTheSynonymQuestion("/home/vishnu/workspace/QuestionGeneration/"+fileName);
 		generateMatchTheDefinitionQuestion("/home/vishnu/workspace/QuestionGeneration/"+fileName);
