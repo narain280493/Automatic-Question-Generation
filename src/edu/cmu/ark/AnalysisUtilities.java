@@ -320,7 +320,6 @@ public class AnalysisUtilities {
 			System.out.println("Result of parser.parse(sentence)"+parser.parse(sentence));
 			if(parser.parse(sentence)){
 				parse = parser.getBestParse();
-				System.out.println("This fucking block was executed");
 				//remove all the parent annotations (this is a hacky way to do it)
 				String ps = parse.toString().replaceAll("\\[[^\\]]+/[^\\]]+\\]", "");
 				System.out.println("ps="+ps);
@@ -332,7 +331,6 @@ public class AnalysisUtilities {
 		}catch(Exception e){
 			System.out.println("Exception-"+e);
 		}
-		System.out.println("This fucking block was executed-Exception"); //this is getting executed  :(
 		parse = readTreeFromString("(ROOT (. .))");
         parseScore = -99999.0;
         return new ParseResult(false, parse, parseScore);

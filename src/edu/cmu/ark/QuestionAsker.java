@@ -106,7 +106,7 @@ public class QuestionAsker {
 		posDistractorList.remove(0);
 		sstDistractorList.remove(0);
 		
-		sstDistractorList=DistractorFilter.applyFiltersToDistractorList(answerPhrase,originalAnsPhrase, sstDistractorList);
+		sstDistractorList=DistractorFilter.applyFiltersToDistractorList(answerPhrase,answerSentence, sstDistractorList);
 		System.out.println("No. of SST Distractors found :"+(sstDistractorList.size()));
 		if(sstDistractorList.size()>=2){
 			distractorCount+=(sstDistractorList.size());
@@ -117,9 +117,6 @@ public class QuestionAsker {
 		System.out.println("No. of POS Distractors found :"+(posDistractorList.size()));
 
 		 
-		//Distractor ranking
-		//substitute the answer phrase with the distractor and check the probability of N-gram using
-		//microsoft bing api 
 				
 		if(isAnsPhraseProperNoun(answerPhrase)){
 			System.out.println("SST distractors: ");
@@ -130,6 +127,10 @@ public class QuestionAsker {
 			
 		}
 		else{
+
+			//Distractor ranking
+			//substitute the answer phrase with the distractor and check the probability of N-gram using
+			//microsoft bing api 
 			System.out.println("Ranking SST distractors");
 			List<Distractor> selectedSSTDistractors=DistractorGenerator.rankDistractor(answerSentence, answerPhrase, sstDistractorList);
 			if(selectedSSTDistractors!=null){
@@ -142,7 +143,7 @@ public class QuestionAsker {
 		
 		}
 		if(distractorCount<3){
-			 posDistractorList=DistractorFilter.applyFiltersToDistractorList(answerPhrase,originalAnsPhrase, posDistractorList);
+			 posDistractorList=DistractorFilter.applyFiltersToDistractorList(answerPhrase,answerSentence, posDistractorList);
 			 posDistractorList=DistractorFilter.removeSSTDistractorsFromPOSDistractorList(posDistractorList,sstDistractorList);
 			 if(isAnsPhraseProperNoun(answerPhrase)){
 					System.out.println("POS distractors: ");
@@ -637,7 +638,8 @@ public class QuestionAsker {
 					System.out.println("Score :"+question.getScore());
 					//Date distractor generation code begins
 					if(question.yield().substring(0,4).equalsIgnoreCase("When")){
-						System.out.println("Date distractor generation begins ");
+						
+						System.out.println("Date distractor generation begins. Checking for possible date string in answerphrase ");
 						List<String> distractorList = DateDistractor.getDistractors(AnalysisUtilities.getCleanedUpYield(question.getAnswerPhraseTree()));
 						int len=1;
 						if(distractorList.size()==3){
@@ -646,11 +648,12 @@ public class QuestionAsker {
 								System.out.print(len+")"+str+"\t");
 							}
 							System.out.println();
+							//SST and POS Distractor generation is not required here since we already have valid date distractors
+							continue;
 						}
 						else{
-							System.out.println("Distractors cannot be created");
+							System.out.println("Date distractors cannot be created.Moving over to SST and POS distractor generation method");
 						}
-						continue;
 					}
 					//Date distractor generation code ends 
 					//if ansTree is null, there is no answer phrase.So don't call distractor generator
@@ -668,10 +671,7 @@ public class QuestionAsker {
 							System.out.println("Resolving answerphrase to a single word...");
 							String headWord=null;
 							try {
-								//headWord = resolveHead(ansPhrase);
-							
 								List<String> possibleHeadWords = HeadWordResolver(originalAnsPhrase);
-								
 								if(possibleHeadWords!=null && possibleHeadWords.size()>=1){
 									System.out.println("Possible headwords");
 									for(String str:possibleHeadWords)
@@ -691,14 +691,16 @@ public class QuestionAsker {
 							}
 						}
 						System.out.println("Answer Phrase :"+ansPhrase);
-						String ansSentence = question.getSourceTree().yield().toString();
+						//String ansSentence = question.getSourceTree().yield().toString();
+
+						String ansSentence =  AnalysisUtilities.getCleanedUpYield(question.getSourceTree());
 						System.out.println("Answer Sentence :"+ansSentence);
 						generateDistractor(INPUT_FILE_NAME, originalAnsPhrase, ansPhrase, ansSentence);
 						
 					}
 					else{
 						System.out.println("Answer Phrase :"+"Yes");
-						String ansSentence = question.getSourceTree().yield().toString();
+						String ansSentence =  AnalysisUtilities.getCleanedUpYield(question.getSourceTree());
 						System.out.println("Answer Sentence :"+ansSentence);
 						String questionSentence=question.yield();
 						Character firstChar=questionSentence.charAt(0);

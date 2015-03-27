@@ -20,14 +20,15 @@ public class Tester {
 //		 String[] output=qa.HeadWordResolver("America and Germany"); //correct
 		// String[] output=qa.HeadWordResolver("to Lincolns and Tonys"); //correct
 		// String[] output=qa.HeadWordResolver("to excellent men"); //correct
-		 List<String>  output=qa.HeadWordResolver("February 12");
+		/* List<String>  output=qa.HeadWordResolver("February 12");
 		 System.out.println("\nOutput:");
 		 for (String word: output) {
 			 	if(word!=null)
 	            System.out.println(word);
 	        }
 		 System.out.println("When was ".substring(0,3));
-	//	System.out.println(output[4]);
+	*/
+		 //	System.out.println(output[4]);
 		
 		
 	// System.out.println(qa.resolveHead("a teacher, counselor, coach, or after-school program director"));
