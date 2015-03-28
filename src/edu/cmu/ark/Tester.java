@@ -1,5 +1,7 @@
 package edu.cmu.ark;
 
+import java.util.List;
+
 import edu.stanford.nlp.trees.tregex.ParseException;
 
 public class Tester {
@@ -18,19 +20,14 @@ public class Tester {
 	//	 String [] output=qa.HeadWordResolver("Americans, Germans and French"); //correct
 //		 String[] output=qa.HeadWordResolver("America and Germany"); //correct
 		// String[] output=qa.HeadWordResolver("to Lincolns and Tonys"); //correct
+
 	//	 String[] output=qa.HeadWordResolver("on the village of Ardekul"); //correct
 		 //String[] output=qa.HeadWordResolver("from Narain Sharma and Vishnu Jayvel");
 		 
 	/*	 System.out.println("\nPossible HeadWords");
-		 for (String word: output) {
-			 	if(word!=null)
-	            System.out.println(word);
-	        }
-		 System.out.println("\n\n");
-		 */
-		 
-	//	System.out.println(output[4]);
-		
+
+		// String[] output=qa.HeadWordResolver("to excellent men"); //correct
+
 		
 	// System.out.println(qa.resolveHead("a teacher, counselor, coach, or after-school program director"));
 		 

@@ -35,6 +35,7 @@ import java.io.*;
 //import java.text.NumberFormat;
 import java.util.*;
 
+import Utility.MiscellaneousHelper;
 import ComprehensionQuestionGeneration.VocabularyQuestion;
 import Configuration.Configuration;
 import distractorgeneration.Distractor;
@@ -84,7 +85,10 @@ public class QuestionAsker {
 	}
 	
 	
-	public static void generateDistractor(String fileName,String originalAnsPhrase,String answerPhrase,String answerSentence){
+	public static void generateDistractor(String fileName,String originalAnsPhrase,String answerPhrase,String answerSentence) throws IOException{
+		File file=new File(Configuration.QUESTION_DISTRACTOR_LOG_PATH);
+		FileWriter fw = new FileWriter(file.getAbsoluteFile());
+		BufferedWriter bw = new BufferedWriter(fw);
 		int distractorCount=0;
 		System.out.println("Distractor generation starts:");
 		//NOTE: call POS Tagger before SST because POS Tagger will group all adjacent proper noun together
@@ -104,7 +108,7 @@ public class QuestionAsker {
 		posDistractorList.remove(0);
 		sstDistractorList.remove(0);
 		
-		sstDistractorList=DistractorFilter.applyFiltersToDistractorList(answerPhrase,originalAnsPhrase, sstDistractorList);
+		sstDistractorList=DistractorFilter.applyFiltersToDistractorList(answerPhrase,answerSentence, sstDistractorList);
 		System.out.println("No. of SST Distractors found :"+(sstDistractorList.size()));
 		if(sstDistractorList.size()>=2){
 			distractorCount+=(sstDistractorList.size());
@@ -115,9 +119,6 @@ public class QuestionAsker {
 		System.out.println("No. of POS Distractors found :"+(posDistractorList.size()));
 
 		 
-		//Distractor ranking
-		//substitute the answer phrase with the distractor and check the probability of N-gram using
-		//microsoft bing api 
 				
 		if(isAnsPhraseProperNoun(answerPhrase)){
 			System.out.println("SST distractors: ");
@@ -128,6 +129,10 @@ public class QuestionAsker {
 			
 		}
 		else{
+
+			//Distractor ranking
+			//substitute the answer phrase with the distractor and check the probability of N-gram using
+			//microsoft bing api 
 			System.out.println("Ranking SST distractors");
 			List<Distractor> selectedSSTDistractors=DistractorGenerator.rankDistractor(answerSentence, answerPhrase, sstDistractorList);
 			if(selectedSSTDistractors!=null){
@@ -140,7 +145,7 @@ public class QuestionAsker {
 		
 		}
 		if(distractorCount<3){
-			 posDistractorList=DistractorFilter.applyFiltersToDistractorList(answerPhrase,originalAnsPhrase, posDistractorList);
+			 posDistractorList=DistractorFilter.applyFiltersToDistractorList(answerPhrase,answerSentence, posDistractorList);
 			 posDistractorList=DistractorFilter.removeSSTDistractorsFromPOSDistractorList(posDistractorList,sstDistractorList);
 			 if(isAnsPhraseProperNoun(answerPhrase)){
 					System.out.println("POS distractors: ");
@@ -172,6 +177,7 @@ public class QuestionAsker {
 		if(multipleChoices.size()>=3){
 		Collections.shuffle(multipleChoices);
 		System.out.println("****************************************************************************************");
+		
 		System.out.println("Multiple choices:");
 		int choiceNumber=1;
 		for(String choice:multipleChoices){
@@ -182,7 +188,7 @@ public class QuestionAsker {
 		}
 		
 	}
-	public static  void getQuestionsForSentence(String sentence){
+	/*public static  void getQuestionsForSentence(String sentence){
 		
 		System.out.println("Summary:"+sentence);
 		String modelPath = "models/linear-regression-ranker-reg500.ser.gz";
@@ -274,8 +280,22 @@ public class QuestionAsker {
 					System.out.println("Resolving answerphrase to a single word...");
 					String headWord=null;
 					try {
+<<<<<<< HEAD
 						headWord = resolveHead(ansPhrase);
 						System.out.println("HeadWord-"+headWord);
+=======
+						//headWord = resolveHead(ansPhrase);
+						//get all possible headwords(nounphrases)
+						String[] possibleHeadWords = HeadWordResolver(originalAnsPhrase);
+						if(possibleHeadWords!=null && possibleHeadWords.length>=1){
+							int rand=MiscellaneousHelper.getRandomNumber(0, possibleHeadWords.length-1);
+							headWord=possibleHeadWords[rand];
+						}
+						else{
+							System.out.println("ERROR :HeadWordResolver is not returning any valid headwords for given answerphrase: "+originalAnsPhrase);
+						}
+					
+>>>>>>> 9a57af41ce4f90ab6ccf1f09927c3ff27f5e4943
 					} catch (ParseException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -311,6 +331,7 @@ public class QuestionAsker {
 		//System.out.println("qg over");
 	
 	}
+	*/
 	/**
 	 * @param args
 	 * @return 
@@ -326,12 +347,13 @@ public class QuestionAsker {
 		
 		//pre-load
 		AnalysisUtilities.getInstance();
-		
+		FileReader in=null;
+		File file=new File(Configuration.QUESTION_DISTRACTOR_LOG_PATH);
 		String buf;
 		Tree parsed;
 		boolean printVerbose = true;//setting printVerbose true always
 		String modelPath = null;
-		
+	
 		List<Question> outputQuestionList = new ArrayList<Question>();
 		boolean preferWH = false;
 		boolean doNonPronounNPC = false;
@@ -342,6 +364,16 @@ public class QuestionAsker {
 		boolean dropPro = true;
 		boolean justWH = false;
 		boolean videoFlag=false;
+		
+		if (!file.exists()) {
+			try {
+				file.createNewFile();
+			} catch (IOException e) {
+				
+				System.out.println("Exception:"+e);
+			}
+		}
+
 		for(int i=0;i<args.length;i++){
 			if(args[i].equals("--flag"))
 			{
@@ -409,9 +441,14 @@ public class QuestionAsker {
 						}
 						INPUT_FILE_NAME=files[0];
 						Configuration.INPUT_FILE_NAME=files[0];
-						
-						FileReader in = new FileReader(files[0]);
-						
+						if(videoFlag)
+						 {
+							in = new FileReader(files[1]);
+						 }
+						else
+						{
+							in = new FileReader(files[0]);
+						}
 					    BufferedReader br = new BufferedReader(in);	
 				
 			
@@ -441,6 +478,8 @@ public class QuestionAsker {
 					break;
 				}
 				Configuration.INPUT_TEXT=doc;
+				FileWriter fw = new FileWriter(file.getAbsoluteFile());
+				BufferedWriter bw = new BufferedWriter(fw);
 				System.out.println("Saving input text in Configuration.INPUT_TEXT variable");
 				long startTime = System.currentTimeMillis();
 				List<String> sentences = AnalysisUtilities.getSentences(doc);
@@ -506,15 +545,39 @@ public class QuestionAsker {
 					System.out.println("=====================================================================================================");
 					System.out.println();
 					System.out.println("QuestionCount: "+questionCount);
+					bw.write("QuestionCount: "+questionCount+"\n");
 					questionCount++;
 					System.out.println("Question :"+question.yield());
+					bw.write("Question:"+question.yield()+"\n");
 					System.out.println("Score :"+question.getScore());
+					//Date distractor generation code begins
+				//	if(question.yield().substring(0,4).equalsIgnoreCase("When")){
+						
+				/*		System.out.println("Date distractor generation begins. Checking for possible date string in answerphrase ");
+					List<String> distractorList = DateDistractor.getDistractors(AnalysisUtilities.getCleanedUpYield(question.getAnswerPhraseTree()));
+						int len=1;
+						if(distractorList.size()==3){
+							System.out.println("Multiple choices:");
+							for(String str:distractorList){
+								System.out.print(len+")"+str+"\t");
+							}
+							System.out.println();
+							//SST and POS Distractor generation is not required here since we already have valid date distractors
+							continue;
+						}
+						else{
+							System.out.println("Date distractors cannot be created.Moving over to SST and POS distractor generation method");
+						}
+						*/
+				//	}
+					//Date distractor generation code ends 
 					//if ansTree is null, there is no answer phrase.So don't call distractor generator
+					
 					if(ansTree != null){
 						ansPhrase = AnalysisUtilities.getCleanedUpYield(question.getAnswerPhraseTree());
 						originalAnsPhrase=ansPhrase;
-						//TODO: if ansPhrase is PRP(pronoun) dont call distractorGenerator
-						if(ansPhrase.equalsIgnoreCase("it")||ansPhrase.equalsIgnoreCase("they")){
+						//TODO: if ansPhrase is PRP(pronoun) dont call distractorGenerator // other cases include "some" (which is a determiner, adjective with respect to diff sentences)
+						if(ansPhrase.equalsIgnoreCase("it")||ansPhrase.equalsIgnoreCase("they")||ansPhrase.equalsIgnoreCase("some")||ansPhrase.equalsIgnoreCase("them")){
 							//TODO: logic has to be done to resolve "it" and "they"
 							continue;
 						}
@@ -523,7 +586,17 @@ public class QuestionAsker {
 							System.out.println("Resolving answerphrase to a single word...");
 							String headWord=null;
 							try {
-								headWord = resolveHead(ansPhrase);
+								List<String> possibleHeadWords = HeadWordResolver(originalAnsPhrase);
+								if(possibleHeadWords!=null && possibleHeadWords.size()>=1){
+									System.out.println("Possible headwords");
+									for(String str:possibleHeadWords)
+											System.out.println(str);
+									int rand=MiscellaneousHelper.getRandomNumber(0, possibleHeadWords.size()-1);
+									headWord=possibleHeadWords.get(rand);
+								}
+								else{
+									System.out.println("ERROR :HeadWordResolver is not returning any valid headwords for given answerphrase: "+originalAnsPhrase);
+								}
 							} catch (ParseException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -533,14 +606,17 @@ public class QuestionAsker {
 							}
 						}
 						System.out.println("Answer Phrase :"+ansPhrase);
-						String ansSentence = question.getSourceTree().yield().toString();
+						//String ansSentence = question.getSourceTree().yield().toString();
+
+						String ansSentence =  AnalysisUtilities.getCleanedUpYield(question.getSourceTree());
 						System.out.println("Answer Sentence :"+ansSentence);
 						generateDistractor(INPUT_FILE_NAME, originalAnsPhrase, ansPhrase, ansSentence);
 						
 					}
 					else{
 						System.out.println("Answer Phrase :"+"Yes");
-						String ansSentence = question.getSourceTree().yield().toString();
+						bw.write("Answer Phrase :"+"Yes"+"\n");
+						String ansSentence =  AnalysisUtilities.getCleanedUpYield(question.getSourceTree());
 						System.out.println("Answer Sentence :"+ansSentence);
 						String questionSentence=question.yield();
 						Character firstChar=questionSentence.charAt(0);
@@ -552,8 +628,10 @@ public class QuestionAsker {
 					
 				}
 				System.out.println("Reasoning questions: ");
+				bw.write("Reasoning Questions:\n");
 				for(String reasoningQuestion:reasoningQuestionList){
 					System.out.println(reasoningQuestion);
+					bw.write(reasoningQuestion+"\n");
 				}
 				
 	
@@ -578,7 +656,7 @@ public class QuestionAsker {
 		}
 		System.out.println();
 	}
-	public static String[] HeadWordResolver(String ansPhrase) throws ParseException{
+	public static List<String> HeadWordResolver(String ansPhrase) throws ParseException{
 		
 		int index=0;
 		int pncount=0;
@@ -643,7 +721,7 @@ public class QuestionAsker {
 		if(ansPhrase==""||ansPhrase==null)
 		{
 			output[0]="Nope";
-			return output;
+			return null;
 		}
 		if(ansPhrase!=""){
 		Tree tree = StanfordParser.parseTree(ansPhrase);
@@ -832,7 +910,10 @@ public class QuestionAsker {
 		    if(tregexPatternMatchNounPhraseMatcher.find()){
 			
 			Tree nounTree = tregexPatternMatchNounPhraseMatcher.getNode("nounphrase");
-       		tregexPatternMatchProperNounMatcher = tregexPatternMatchProperNounModifier.matcher(nounTree);
+			//Vishnu made changes here
+			if(nounTree==null)
+					return null;
+			tregexPatternMatchProperNounMatcher = tregexPatternMatchProperNounModifier.matcher(nounTree);
        		tregexPatternMatchProperNounPluralMatcher = tregexPatternMatchProperNounPluralModifier.matcher(nounTree);
        		//to check whether NNP are present.
        		while(tregexPatternMatchProperNounMatcher.find()||tregexPatternMatchProperNounPluralMatcher.find())
@@ -938,8 +1019,14 @@ public class QuestionAsker {
 	
 
 		}
-		
-		return output;
+		List<String> headWordList = new ArrayList<String>();
+		for(String word:output){
+			if(word != null){
+				headWordList.add(word);
+			}
+			
+		}
+		return headWordList;
 	}
 	
 	public static String resolveHead(String ansPhrase) throws ParseException{

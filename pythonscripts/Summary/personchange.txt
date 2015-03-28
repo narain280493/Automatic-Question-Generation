@@ -1,4 +1,4 @@
-I:The author
+I:the speaker
 my:his
 is:was
 are:were

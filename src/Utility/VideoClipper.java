@@ -13,6 +13,7 @@ public class VideoClipper {
 	public static ArrayList<String> ClipVideo()
 	{
 		ArrayList<String> paragraph =new ArrayList<String>();
+		
 		try {
 			Process p = Runtime.getRuntime().exec("python"+" "+Configuration.SUMMARY_PYTHON_SCRIPT_PATH);
 			BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -29,12 +30,12 @@ public class VideoClipper {
 			 System.out.println("Start time:"+start_time);
 			 System.out.println("End time:"+end_time);
 			 
-			 p=Runtime.getRuntime().exec("python"+" "+Configuration.VIDEO_CROPPER_SCRIPT_PATH+" "+start_time+" "+end_time);
+			/* p=Runtime.getRuntime().exec("python"+" "+Configuration.VIDEO_CROPPER_SCRIPT_PATH+" "+start_time+" "+end_time);
 			BufferedReader inn=new BufferedReader(new InputStreamReader(p.getInputStream()));
 			 while((clippingStatus = inn.readLine())!=null){
 				 	System.out.println(clippingStatus);
 				 	
-			 }
+			 }*/
 			 return paragraph;
 		} 
 		

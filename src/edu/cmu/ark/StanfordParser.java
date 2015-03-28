@@ -164,7 +164,7 @@ public class StanfordParser
         synchronized (parser) {
             Tokenizer tokenizer = tlp.getTokenizerFactory().getTokenizer(new StringReader(sentence));
             List<Word> words = tokenizer.tokenize();
-            System.out.println("Tokenization: "+words);
+        //    System.out.println("Tokenization: "+words);
             parser.parse(new Sentence(words));
             tree = parser.getBestParse();
         }

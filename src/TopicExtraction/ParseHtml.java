@@ -31,7 +31,7 @@ public class ParseHtml {
         Element topicList = topicDiv.select("ul#topics").first();
         Elements topics = topicList.select("li");
         for(Element topic:topics){
-        	System.out.println(topic.text()+" "+topic.select("a").attr("linkprob"));
+        //	System.out.println(topic.text()+" "+topic.select("a").attr("linkprob"));
         	list.add(new Topic(topic.text(),Double.valueOf(topic.select("a").attr("linkprob"))));
         }
         return list;

@@ -11,7 +11,8 @@ content = " "
 
 count =0
 inputText =" "
-
+f= open("/home/narain/workspace/questiongeneration/summarycontent.txt","wb")
+g= open("/home/narain/workspace/questiongeneration/transcripttext.txt","wb")
 with open("/home/narain/workspace/questiongeneration/transcript.json") as json_file:
     json_data = json.load(json_file)
    
@@ -27,6 +28,7 @@ content = contractions(content)
 #print "After expanding contractions:\n",content
 content = regex(content)
 #print "After processing: \n",content
+g.write(content)
 st = SummaryTool()
 sentences_dic = st.get_senteces_ranks(content)
 summary = st.get_distractors(content,sentences_dic,1)
@@ -44,6 +46,8 @@ for p in paragraph:
     	inputText = paragraph[count-1]
         break
 #print "paragraph:",inputText
+inputText = firstToThirdPerson(inputText)
+
 outputList = []
 tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 sentences = tokenizer.tokenize(inputText)
@@ -55,7 +59,8 @@ for sentence in sentences:
    #     print "Less than 55"
         outputList.append(sentence)
 for sentence in outputList:
-    print sentence
+	f.write(sentence)
+	#print sentence
 
 
 
