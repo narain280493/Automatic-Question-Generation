@@ -111,13 +111,6 @@ public class QuestionAsker {
 		if(sstDistractorList.size()>=2){
 			distractorCount+=(sstDistractorList.size());
 		}
-		
-		
-		//stage 2 POSTagger
-		System.out.println("No. of POS Distractors found :"+(posDistractorList.size()));
-
-		 
-				
 		if(isAnsPhraseProperNoun(answerPhrase)){
 			System.out.println("SST distractors: ");
 			for(String word:sstDistractorList){
@@ -133,18 +126,29 @@ public class QuestionAsker {
 			//microsoft bing api 
 			System.out.println("Ranking SST distractors");
 			List<Distractor> selectedSSTDistractors=DistractorGenerator.rankDistractor(answerSentence, answerPhrase, sstDistractorList);
-			if(selectedSSTDistractors!=null){
+			if(selectedSSTDistractors!=null&&selectedSSTDistractors.size()>=1){
 				for(Distractor distractor:selectedSSTDistractors){
 				System.out.println(distractor.distractorWord+" "+distractor.weight);
 				selectedDistractors.add(distractor);
+				}
+			}
+			else{
+				System.out.println("No SST distractors are found or something went wrong in ranking ");
 			}
 			 
-		}
+		
 		
 		}
-		if(distractorCount<3){
+		if(distractorCount<2){
+			System.out.println("POS distractors before applying filters");
+			for(String str:posDistractorList){
+				System.out.println(str);
+			}
 			 posDistractorList=DistractorFilter.applyFiltersToDistractorList(answerPhrase,answerSentence, posDistractorList);
 			 posDistractorList=DistractorFilter.removeSSTDistractorsFromPOSDistractorList(posDistractorList,sstDistractorList);
+			//stage 2 POSTagger
+			System.out.println("No. of POS Distractors found :"+(posDistractorList.size()));
+
 			 if(isAnsPhraseProperNoun(answerPhrase)){
 					System.out.println("POS distractors: ");
 					for(String word:posDistractorList){
@@ -155,12 +159,16 @@ public class QuestionAsker {
 			else{
 			 System.out.println("Ranking POS distractors");
 			 List<Distractor> selectedPOSDistractors=DistractorGenerator.rankDistractor(answerSentence, answerPhrase, posDistractorList);
-			 if(selectedPOSDistractors!=null){
+			 if(selectedPOSDistractors!=null&&selectedPOSDistractors.size()>=1){
 				 for(Distractor distractor:selectedPOSDistractors){
 					 System.out.println(distractor.distractorWord+" "+distractor.weight);
 					 selectedDistractors.add(distractor);
 				 }
 			 }
+			 else{
+					System.out.println("No POS distractors are found or something went wrong in ranking ");
+				}
+			 
 			}
 		 }
 		List<String> multipleChoices=new ArrayList<String>();
@@ -185,117 +193,6 @@ public class QuestionAsker {
 		}
 		
 	}
-	/*public static  void getQuestionsForSentence(String sentence){
-		
-		System.out.println("Summary:"+sentence);
-		String modelPath = "models/linear-regression-ranker-reg500.ser.gz";
-		List<Tree> inputTrees = new ArrayList<Tree>();
-		Tree parsed;
-		InitialTransformationStep trans = new InitialTransformationStep();
-		QuestionTransducer qt = new QuestionTransducer();
-		boolean preferWH = false;
-		Integer maxLength = 2000;
-		boolean downweightPronouns = false;
-		boolean avoidFreqWords = false;
-		boolean justWH = false;
-		
-		
-		List<Question> outputQuestionList = new ArrayList<Question>();
-		AnalysisUtilities.getInstance();
-		GlobalProperties.setDebug(true);
-		
-		if(modelPath != null){
-			System.err.println("Loading question ranking models from "+modelPath+"...");
-			qr = new QuestionRanker();
-			qr.loadModel(modelPath);
-		}
-		
-		parsed = AnalysisUtilities.getInstance().parseSentence(sentence).parse;
-		inputTrees.add(parsed);
-		
-	
-		System.out.println("Parse Tree-"+parsed);
-		//step 1 transformations
-		List<Question> transformationOutput = trans.transform(inputTrees);
-		System.out.println("Step 1");
-		//step 2 question transducer
-		for(Question t: transformationOutput){
-			if(GlobalProperties.getDebug()) System.err.println("Stage 2 Input: "+t.getIntermediateTree().yield().toString());
-			qt.generateQuestionsFromParse(t);
-			outputQuestionList.addAll(qt.getQuestions());
-		}			
-		
-		//remove duplicates
-		QuestionTransducer.removeDuplicateQuestions(outputQuestionList);
-		System.out.println("step2");
-		//step 3 ranking
-		if(qr != null){
-			qr.scoreGivenQuestions(outputQuestionList);
-			boolean doStemming = true;
-			QuestionRanker.adjustScores(outputQuestionList, inputTrees, avoidFreqWords, preferWH, downweightPronouns, doStemming);
-			QuestionRanker.sortQuestions(outputQuestionList, false);
-		}
-		System.out.println("step3");
-		//now print the questions
-		
-		for(Question question: outputQuestionList){
-			String ansPhrase="";
-			String originalAnsPhrase="";
-				
-			if(question.getTree().getLeaves().size() > maxLength){
-				continue;
-			}
-			if(justWH && question.getFeatureValue("whQuestion") != 1.0){
-				continue;
-			}
-			System.out.println("Question :"+question.yield());
-			System.out.println("Score :"+question.getScore());
-			Tree ansTree = question.getAnswerPhraseTree();
-			if(ansTree != null){
-				ansPhrase = AnalysisUtilities.getCleanedUpYield(question.getAnswerPhraseTree());
-				originalAnsPhrase=ansPhrase;
-				System.out.println("Answer Phrase detected :"+ansPhrase);
-				if (!isAnsPhraseProperNoun(ansPhrase)&&(countWords(ansPhrase)>=2)) {
-					System.out.println("Resolving answerphrase to a single word...");
-					String headWord=null;
-					try {
-						//headWord = resolveHead(ansPhrase);
-						//get all possible headwords(nounphrases)
-						String[] possibleHeadWords = HeadWordResolver(originalAnsPhrase);
-						if(possibleHeadWords!=null && possibleHeadWords.length>=1){
-							int rand=MiscellaneousHelper.getRandomNumber(0, possibleHeadWords.length-1);
-							headWord=possibleHeadWords[rand];
-						}
-						else{
-							System.out.println("ERROR :HeadWordResolver is not returning any valid headwords for given answerphrase: "+originalAnsPhrase);
-						}
-					
-					} catch (ParseException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					if(headWord!=null){
-						ansPhrase=headWord;
-					}
-				}
-				System.out.println("Answer Phrase :"+ansPhrase);
-				String ansSentence = question.getSourceTree().yield().toString();
-				System.out.println("Answer Sentence :"+ansSentence);
-				generateDistractor(INPUT_FILE_NAME, originalAnsPhrase, ansPhrase, ansSentence);
-				
-			}
-			else{
-				String ansSentence = question.getSourceTree().yield().toString();
-				System.out.println("Answer Sentence :"+ansSentence);
-				
-			}
-			
-		}
-
-		System.out.println("qg over");
-	
-	}
-	*/
 	/**
 	 * @param args
 	 * @return 

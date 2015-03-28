@@ -56,6 +56,7 @@ public static List<List<String>> getNgrams(String[] wordList,String distractor,i
 	return ngramList;
 	   
 }
+
 public static List<Distractor> rankDistractor(String sentence,String ans,List<String> distractors){
 	//bug
 	//remove dots at the end of the string alone and not from floating point numbers like "7.12"

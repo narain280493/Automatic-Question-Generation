@@ -32,8 +32,8 @@ public class DistractorFilter {
 			maximumDistractorWordCount=Math.max(maximumDistractorWordCount, str.split("\\s+").length);
 		}
 
-		System.out.println("Filter words for answerSentence :"+answerSentence);
-		System.out.println("maximumDistractorWordCount :"+maximumDistractorWordCount);
+	//	System.out.println("Filter words for answerSentence :"+answerSentence);
+		//System.out.println("maximumDistractorWordCount :"+maximumDistractorWordCount);
 		for(int i=0;i<strs.length;i++){
 			String filterWord="";
 			int spaceRequired=0;
