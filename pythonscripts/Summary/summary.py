@@ -183,24 +183,18 @@ def main():
 
     st = SummaryTool()
 
-    filepath = """/home/narain/Documents/inputs/KatherineHepburn.txt"""
-    ccontent = st.readFile(filepath)
-    fo = open("fee.txt","wb")
+    filepath = """bullying.txt"""
+    content = st.readFile(filepath)
+    fo = open("bullying_summary.txt","wb")
 
    # print content
     complete_summary = [] 
 
     para_summary = [] 
 
-    content = """  Iraqi Vice President Taha Yassin Ramadan announced today, Sunday,that Iraq refuses to back down from its decision to stop cooperating with disarmament inspectors before its demands are met.
-Iraqi Vice president Taha Yassin Ramadan announced today, Thursday, that Iraq rejects cooperating with the United Nations except on the issue of lifting the blockade imposed upon it since the year 1990.
-Ramadan told reporters in Baghdad that ”Iraq cannot deal positively with whoever represents the Security Council unless there was a clear stance on the issue of lifting the blockade off of it. 
-
-Baghdad had decided late last October to completely cease cooperating with the inspectors of the United Nations Special Commission (UNSCOM), in charge of disarming Iraq’s weapons, and whose work became very limited since the fifth of August, and announced it will not resume its cooperation with the Commission even if it were subjected to a military operation.
-The Russian Foreign Minister, Igor Ivanov, warned today, Wednesday against using force against Iraq, which will destroy, according to him, seven years of difficult diplomatic work and will complicate the regional situation in the area.
-Ivanov contended that carrying out air strikes against Iraq, who refuses to cooperate with the United Nations inspectors, “will end the tremendous work achieved by the international group during the past seven years and will complicate the situation in the region.”
-Nevertheless, Ivanov stressed that Baghdad must resume working with the Special Commission in charge of disarming the Iraqi weapons of mass destruction (UNSCOM). ﻿"""
- #Building the sentence dictionary
+    ccontent = """The Qayen earthquake was a major earthquake that struck Northern Iran's Khorasan Province on May 10, 1997. The largest in the area since 1990, it measured 7.3 on the moment magnitude scale and was centered approximately 270 kilometers (170 mi) south of Mashhad on the village of Ardekul. 
+The third earthquake that year to cause severe damage, it devastated the Birjand–Qayen region, killing 1,567 and injuring over 2,300. The earthquake—which left 50,000 homeless and damaged or destroyed over 15,000 homes—was described as the deadliest of 1997 by the United States Geological Survey. 
+Some 155 aftershocks caused further destruction and drove away survivors. The earthquake was later discovered to have been caused by a rupture along a fault that runs underneath the Iran–Afghanistan border. Damage was eventually estimated at $100 million, and many countries responded to the emergency with donations of blankets, tents, clothing, and food. Rescue teams were also dispatched to assist local volunteers in finding survivors trapped under the debris. The destruction around the earthquake's epicenter was, in places, almost total; this has been attributed to poor construction practices, and imparted momentum to a growing movement for changes in building codes. With 1 in 3,000 deaths in Iran attributable to earthquakes, one expert has suggested that a country-wide rebuilding program would be needed to address the ongoing public safety concerns. """
     sentences_dic = st.get_senteces_ranks(content)
     
    
@@ -216,19 +210,25 @@ Nevertheless, Ivanov stressed that Baghdad must resume working with the Special 
    
 
     if len(paragraphs) > 1:
-        print "More than One Para -\n"
+        #print "More than One Para -\n"
         print len(paragraphs)
         complete_summary = st.get_distractors(content,sentences_dic,1)
         question = st.generate_questions(1)
         #st.question_printer(question)
         #print('Q: %s \n' %question )
         fo.write("Passage Based Questions: \n")
+	print "Passage Based Questions:\n"
         fo.write("Q:")
+	print "Q:"
         fo.write(question)
+	print question
         fo.write("\n")
+	print "\n"
         for sentence in complete_summary:
             fo.write(sentence)
+	    print sentence	
             fo.write("\n ---------- \n")
+            print "\n ---------- \n"
 
         
             #print sentence
@@ -239,11 +239,16 @@ Nevertheless, Ivanov stressed that Baghdad must resume working with the Special 
             question = st.generate_questions(2)
             #st.question_printer(question)
             fo.write("Q:")
+	    print "Q:"	
             fo.write(question)
-            fo.write("\n")
+            print question
+	    fo.write("\n")
+	    print "\n"
             for sentence in p:
                 fo.write(sentence)
+ 		print sentence
                 fo.write("\n ---------- \n")
+		print "\n ---------- \n"
         fo.close()
                 
 

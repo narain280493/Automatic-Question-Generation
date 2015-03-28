@@ -221,29 +221,39 @@ def main():
         #st.question_printer(question)
         #print('Q: %s \n' %question )
         fo.write("Passage Based Questions: \n")
+      #  print "Passage Based Questions:\n"
         fo.write("Q:")
+      #  print "Q:"
         fo.write(question)
+       # print question
         fo.write("\n")
+        #print "\n"
         for sentence in complete_summary:
             fo.write(sentence)
+        #    print sentence
             fo.write("\n ---------- \n")
-
+         #   print "---------- \n"
         
             #print sentence
             
         para_summary = st.distractors_for_entire_paragraph(content, sentences_dic) #List of List
         fo.write("Paragraph Based Q's: \n")
+      #  print "Paragraph Based Q's: \n"
         for p in para_summary:
             question = st.generate_questions(2)
             #st.question_printer(question)
             fo.write("Q:")
-            
+           # print "Q:"
             fo.write(question)
+           # print question
             fo.write("\n")
-            for sentence in p:
+            #print "\n"
+           # for sentence in p:
                 
-                fo.write(sentence)
-                fo.write("\n ---------- \n")
+            fo.write(sentence)
+            #    print sentence
+            fo.write("\n ---------- \n")
+             #   print "----------\n"
         fo.close()
                 
 
@@ -257,7 +267,7 @@ def main():
         fo.write(question)
         fo.write("\n")
         for sentence in complete_summary:
-             fo.write("Q:")
+            fo.write("Q:")
             fo.write(question)
             fo.write(sentence)
             fo.write("\n ---------- \n")

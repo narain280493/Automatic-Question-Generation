@@ -275,6 +275,7 @@ public class QuestionAsker {
 					String headWord=null;
 					try {
 						headWord = resolveHead(ansPhrase);
+						System.out.println("HeadWord-"+headWord);
 					} catch (ParseException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -340,8 +341,13 @@ public class QuestionAsker {
 		boolean avoidFreqWords = false;
 		boolean dropPro = true;
 		boolean justWH = false;
-		
+		boolean videoFlag=false;
 		for(int i=0;i<args.length;i++){
+			if(args[i].equals("--flag"))
+			{
+				System.out.println("Video Question Generation");
+				videoFlag=true;
+			}
 			if(args[i].equals("--debug")){
 				GlobalProperties.setDebug(true);
 			}else if(args[i].equals("--verbose")){
@@ -403,7 +409,9 @@ public class QuestionAsker {
 						}
 						INPUT_FILE_NAME=files[0];
 						Configuration.INPUT_FILE_NAME=files[0];
+						
 						FileReader in = new FileReader(files[0]);
+						
 					    BufferedReader br = new BufferedReader(in);	
 				
 			
@@ -595,7 +603,7 @@ public class QuestionAsker {
 		String tregexMatchProperNounModifier ="NNP=propernounsingular";
 		String tregexMatchProperNounPluralModifier ="NNPS=propernounplural";
 		String tregexMatchNounPhraseModifier = "NP=nounphrase";
-		String tregexMatchNPNPModifier="NP < NP";
+		String tregexMatchAdjectiveModifier="JJ=adjective";
 		
 		TregexPattern tregexPatternMatchNounPhraseConjunctionModifier;
 		TregexPattern tregexPatternMatchProperNounConjunctionModifier;
@@ -604,7 +612,7 @@ public class QuestionAsker {
 		TregexPattern tregexPatternMatchNounPhraseModifier;
 		TregexPattern tregexPatternMatchProperNounModifier;
 		TregexPattern tregexPatternMatchProperNounPluralModifier;
-		TregexPattern tregexPatternMatchNPNPModifier;
+		TregexPattern tregexPatternMatchAdjectiveModifier;
 		
 		TregexMatcher tregexPatternMatchNounPhraseConjunctionMatcher;
 		TregexMatcher tregexPatternMatchProperNounConjunctionMatcher;
@@ -613,7 +621,7 @@ public class QuestionAsker {
 		TregexMatcher tregexPatternMatchNounPhraseMatcher;
 		TregexMatcher tregexPatternMatchProperNounMatcher;
 		TregexMatcher tregexPatternMatchProperNounPluralMatcher;
-		TregexMatcher tregexPatternMatchNPNPMatcher;
+		TregexMatcher tregexPatternMatchAdjectiveMatcher;
 		
 		tregexPatternMatchNounPhraseConjunctionModifier = TregexPattern.compile(tregexMatchNounPhraseConjunctionModifier);
 		tregexPatternMatchProperNounConjunctionModifier = TregexPattern.compile(tregexMatchProperNounConjunctionModifier);
@@ -622,7 +630,7 @@ public class QuestionAsker {
 		tregexPatternMatchNounPhraseModifier = TregexPattern.compile(tregexMatchNounPhraseModifier);
 		tregexPatternMatchProperNounModifier = TregexPattern.compile(tregexMatchProperNounModifier);
 		tregexPatternMatchProperNounPluralModifier = TregexPattern.compile(tregexMatchProperNounPluralModifier);
-		tregexPatternMatchNPNPModifier = TregexPattern.compile(tregexMatchNPNPModifier);
+		tregexPatternMatchAdjectiveModifier = TregexPattern.compile(tregexMatchAdjectiveModifier);
 		
 		CollinsHeadFinder headFinder = new CollinsHeadFinder();
 		
@@ -659,7 +667,7 @@ public class QuestionAsker {
 			 tree = StanfordParser.parseTree(originalString);
 				}
 		
-		
+		tregexPatternMatchAdjectiveMatcher = tregexPatternMatchAdjectiveModifier.matcher(tree);
 		tregexPatternMatchNounPhraseConjunctionMatcher = tregexPatternMatchNounPhraseConjunctionModifier.matcher(tree);
 		tregexPatternMatchProperNounConjunctionMatcher = tregexPatternMatchProperNounConjunctionModifier.matcher(tree);
 		tregexPatternMatchNounPhraseMatcher = tregexPatternMatchNounPhraseModifier.matcher(tree);
@@ -821,7 +829,7 @@ public class QuestionAsker {
 		
 		if(ruleMatch==false){
 			System.out.println("Rule Match: NP=nounphrase");
-		    tregexPatternMatchNounPhraseMatcher.find();
+		    if(tregexPatternMatchNounPhraseMatcher.find()){
 			
 			Tree nounTree = tregexPatternMatchNounPhraseMatcher.getNode("nounphrase");
        		tregexPatternMatchProperNounMatcher = tregexPatternMatchProperNounModifier.matcher(nounTree);
@@ -869,7 +877,7 @@ public class QuestionAsker {
        	
        		if(propernounPresent==false){
        		
-      // 		System.out.println("Common Noun present.");
+       		System.out.println("Common Noun present.");
        		tregexPatternMatchCommonNounMatcher = tregexPatternMatchCommonNounModifier.matcher(nounTree);
        		tregexPatternMatchCommonNounPluralMatcher = tregexPatternMatchCommonNounPluralModifier.matcher(nounTree);
        		while(tregexPatternMatchCommonNounMatcher.find()||tregexPatternMatchCommonNounPluralMatcher.find())
@@ -891,7 +899,7 @@ public class QuestionAsker {
     //   			np=true;
            	}
        		if(commonnounPresent==false){
-//       		System.out.println("Common Noun not present. Going to select the headword from the NP");
+      // 		System.out.println("Common Noun not present. Going to select the headword from the NP");
        		Tree npHead = headFinder.determineHead(nounTree);
        		String headTag = TreeUtil.getLabel(npHead);
        		output[index++]=headTag;
@@ -899,7 +907,7 @@ public class QuestionAsker {
       // 		np=true;
        		}
        		
-       		//System.out.println("Just Noun Phrase:"+headTag);
+       //		System.out.println("Just Noun Phrase:");
        		}
        	/*	System.out.println("Size of output array="+index);
        		for(int i=1;i<index;i++)
@@ -907,7 +915,20 @@ public class QuestionAsker {
        			System.out.print(output[i]+" ");
        		}
        	*/
+		    }
 		}
+		if(ruleMatch==false)
+		{
+			while(tregexPatternMatchAdjectiveMatcher.find())
+			{
+
+       			Tree adjective=tregexPatternMatchAdjectiveMatcher.getNode("adjective");	
+       			String adj= TreeUtil.getLabel(adjective);
+       			System.out.println("Adjective:"+adj);
+			}
+			ruleMatch=true;
+		}
+		
 		if(ruleMatch==false){
 			output[0]="Nope";
 			System.out.println("No rule matched.");
@@ -923,27 +944,34 @@ public class QuestionAsker {
 	
 	public static String resolveHead(String ansPhrase) throws ParseException{
 		int count=0;
-		System.out.println("Inside QuestionAsker");
+		System.out.println("Inside ResolveHead");
 		String tregexMatchNounModifier = "NP=noun";
 		TregexPattern tregexPatternMatchNounModifier;
 		TregexMatcher tregexMatcher;
 		tregexPatternMatchNounModifier = TregexPattern.compile(tregexMatchNounModifier);
+		System.out.println("Test1");
 		CollinsHeadFinder headFinder = new CollinsHeadFinder();
 		try {
+			System.out.println("Test2");
 			StanfordParser.initialize();
+			System.out.println("Test3");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			System.out.println("Exception:"+e);
+		
 		}
+		System.out.println("Test4");
 		Tree tree = StanfordParser.parseTree(ansPhrase);
-		System.out.println("Parse Tree(Ans Phrase)"+tree);
+		System.out.println("Test5");
+	//	System.out.println("Parse Tree(Ans Phrase)"+tree);
 		tregexMatcher = tregexPatternMatchNounModifier.matcher(tree);
 		while (tregexMatcher.find()) {
 			
 			Tree nounTree = tregexMatcher.getNode("noun");
 			Tree npHeadTree = headFinder.determineHead(nounTree);
        		String headTag = TreeUtil.getLabel(npHeadTree);
-       		
+       		System.out.println("HeadTag:"+headTag);
        	
        				
 		   //System.out.println(npHeadTree.toString());

@@ -7,25 +7,28 @@ public class Tester {
 
 
 		 QuestionAsker qa = new QuestionAsker();
-		qa.getQuestionsForSentence("My name is Narain.");
-		 
+		//qa.getQuestionsForSentence("My name is Narain.");
+		String arg[]={"--debug","--model models/linear-regression-ranker-reg500.ser.g" ,"--flag"};
+		QuestionAsker.main(arg);
 		// String[] output=new String[50];
-		// String output =qa.HeadWordResolver("to Abraham Lincoln"); //correct
-		//String[] output=qa.HeadWordResolver("John, Vishnu and Adi");//fails for these type of cases. //need NER to resolve these.
+	//	 String output[] =qa.HeadWordResolver("to Narain Sharma and Aditya Suresh Kumar"); //correct
+		//String[] output=qa.HeadWordResolver("John, Vishnu, Adi and Sai");//fails for these type of cases. //need NER to resolve these.
 	//	 String[] output=qa.HeadWordResolver("an excellent farmer,carpenter or engineer"); //correct 
 	//	 String[] output=qa.HeadWordResolver("a teacher, counselor, coach, or after-school program director");//correct
 	//	 String [] output=qa.HeadWordResolver("Americans, Germans and French"); //correct
 //		 String[] output=qa.HeadWordResolver("America and Germany"); //correct
 		// String[] output=qa.HeadWordResolver("to Lincolns and Tonys"); //correct
-		// String[] output=qa.HeadWordResolver("to excellent men"); //correct
-	
+	//	 String[] output=qa.HeadWordResolver("on the village of Ardekul"); //correct
+		 //String[] output=qa.HeadWordResolver("from Narain Sharma and Vishnu Jayvel");
 		 
-		 /*String [] output=qa.HeadWordResolver("from Narain Sharma and Vishnu Jayvel");
-		 System.out.println("\nOutput:");
+	/*	 System.out.println("\nPossible HeadWords");
 		 for (String word: output) {
 			 	if(word!=null)
 	            System.out.println(word);
-	        }*/
+	        }
+		 System.out.println("\n\n");
+		 */
+		 
 	//	System.out.println(output[4]);
 		
 		

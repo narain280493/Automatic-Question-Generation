@@ -153,16 +153,18 @@ public class StanfordParser
 	@SuppressWarnings("unchecked")
     public static Tree parseTree(String sentence)
     {
+		System.out.println("Stanford Parse Tree-"+sentence);
         if (tlp == null || parser == null)
             throw new RuntimeException("Parser has not been initialized");
         
         // parse the sentence to produce stanford Tree
         log.debug("Parsing sentence");
+        System.out.println("Parsing sentence");
         Tree tree = null;
         synchronized (parser) {
             Tokenizer tokenizer = tlp.getTokenizerFactory().getTokenizer(new StringReader(sentence));
             List<Word> words = tokenizer.tokenize();
-            log.debug("Tokenization: "+words);
+            System.out.println("Tokenization: "+words);
             parser.parse(new Sentence(words));
             tree = parser.getBestParse();
         }
