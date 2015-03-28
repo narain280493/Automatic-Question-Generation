@@ -20,9 +20,8 @@ public class Tester {
 //			    
 //		   }
 //		  
-	String str1="Apple",str2="apple";
-	System.out.println(str1.equalsIgnoreCase(str2));
-	System.out.println(str2.equalsIgnoreCase(str1));
+	String str1="I like the numbers 3.142 and 2.7 and qwert .",str2="apple";
+	System.out.println(str1.replaceAll("\\.(?!\\d)",""));
 	}
 	
 }

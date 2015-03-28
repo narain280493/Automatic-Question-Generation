@@ -20,14 +20,18 @@ public class Tester {
 //		 String[] output=qa.HeadWordResolver("America and Germany"); //correct
 		// String[] output=qa.HeadWordResolver("to Lincolns and Tonys"); //correct
 		// String[] output=qa.HeadWordResolver("to excellent men"); //correct
-		/* List<String>  output=qa.HeadWordResolver("February 12");
+		List<String>  output=qa.HeadWordResolver("in Hardin County and Thromas");
+		
 		 System.out.println("\nOutput:");
-		 for (String word: output) {
-			 	if(word!=null)
-	            System.out.println(word);
-	        }
-		 System.out.println("When was ".substring(0,3));
-	*/
+		 if(output==null)
+			 System.out.println("No response");
+		 else{
+			 for (String word: output) {
+				 	if(word!=null)
+		            System.out.println(word);
+		        }
+		}
+		
 		 //	System.out.println(output[4]);
 		
 		

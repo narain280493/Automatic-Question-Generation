@@ -13,13 +13,16 @@ import Utility.WordNetPythonAPI;
 import edu.cmu.ark.PorterStemmer;
 
 public class DistractorFilter {
-	public static Set<String> filterWords=new HashSet<String>();
 	public static List<String> applyFiltersToDistractorList(String resolvedAnswerPhrase,String answerSentence,List<String> distractorList){
 		List<String> removedList=new ArrayList<String>();
-		
+
+		Set<String> filterWords=new HashSet<String>();
 		//Filter 1:
 		//converting all words in answerPhrase to lowercase
 		answerSentence=answerSentence.toLowerCase();
+		//remove dots at the end of the string alone and not from floating point numbers like "7.12"
+		answerSentence=answerSentence.replaceAll("\\.(?!\\d)","");
+		//remove all punctuation marks
 		answerSentence = answerSentence.replaceAll("[!?,]", "");
 	//	System.out.println(answerSentence);
 		String[] strs = answerSentence.split("\\s+");
@@ -61,10 +64,9 @@ public class DistractorFilter {
 		// a) if A's synonym set contain B
 		// b) intersection of A's synonym set and B's synonym set is not null
 		if(Configuration.INPUT_FILE_NAME==null){
-			System.out.println("Input file name is missing .Cannot use filter 2");
-			
+			System.out.println("Input file name is missing .Making input.txt as input file");
+			Configuration.INPUT_FILE_NAME="input.txt";
 		}
-		else{
 			String sstOfResolvedAnswerPhrase = SuperSenseTagHelper.getSSTForGivenWord(Configuration.INPUT_FILE_PATH+Configuration.INPUT_FILE_NAME,resolvedAnswerPhrase);
 			Set<String> synonymsOfResolvedAnswerPhrase=new HashSet<String>(WordNetPythonAPI.getResponse("synonym", resolvedAnswerPhrase,sstOfResolvedAnswerPhrase));
 			filterWords.addAll(synonymsOfResolvedAnswerPhrase);
@@ -79,7 +81,7 @@ public class DistractorFilter {
 					}
 				}
 			}
-		}
+		
 		//changing all distractors to lowercase words
 		for(int i=0;i<distractorList.size();i++){
 			distractorList.set(i,distractorList.get(i).toLowerCase());
@@ -95,11 +97,12 @@ public class DistractorFilter {
 		for(String str:filterWords){
 			System.out.println(str);
 		}
-		System.out.println("After filtering");
+		*/
+		/*System.out.println("After filtering");
 		for(String str:removedList){
 			System.out.println(str);
-		}
-		*/
+		}*/
+		
 		return removedList;
 	}
 	
@@ -114,10 +117,10 @@ public class DistractorFilter {
 	public static void main(String[] args) {
 		List<String> list=new ArrayList<String>();
 		list.add("Hardin County");
-		list.add("vellore");
-		list.add("chennai");
-		list.add("lincoln");
-		list=applyFiltersToDistractorList("Abraham","Abraham Lincoln was born on February 12 , 1809 , in Hardin County , Kentucky , to Thomas and Nancy Lincoln in their one roomlog", list);
+		list.add("Nancy Lincoln");
+		list.add("Abraham Lincoln");
+
+		list=applyFiltersToDistractorList("Thomas","Although Thomas lacked formal education, he was an excellent farmer and carpenter, and often times served as a member of the jury.", list);
 		System.out.println();
 		System.out.println();
 		System.out.println("After removing:");
