@@ -64,6 +64,8 @@ public static List<Distractor> rankDistractor(String sentence,String ans,List<St
 	//remove all punctuation marks
 	sentence=sentence.replaceAll("[!?,]", "");
 	String[] wordList=sentence.split("\\s+");
+
+	List<Distractor> distractorList=new ArrayList<Distractor>();
 	int N;
 	int index=0;
 	for(String word:wordList){
@@ -73,13 +75,19 @@ public static List<Distractor> rankDistractor(String sentence,String ans,List<St
 	}
 	if(index==wordList.length){
 		System.out.println("ansWord: "+ans+" is not found in the sentence: "+sentence);
-		return null;
+		//if ansWord is not present in the answer sentence then return the default distractor list itself
+		//Example:
+		//Answer Phrase :bullying
+		//Answer Sentence :They may also have low self-esteem and poor social skills, which makes it hard for them to stand up for themselves.
+		for(String distractor:distractors){
+			distractorList.add(new Distractor(distractor, 1));
+		}
+		return distractorList;
 	}
 	if(wordList.length>=5)
 		N=5;
 	else
 		N=wordList.length;
-	List<Distractor> distractorList=new ArrayList<Distractor>();
 	for(String distractor:distractors){
 		List<List<String>> ngramList=getNgrams(wordList, distractor, index, N);
 		double probabilitySum=0;

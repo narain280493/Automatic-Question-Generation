@@ -17,6 +17,9 @@ public class DistractorFilter {
 		List<String> removedList=new ArrayList<String>();
 
 		Set<String> filterWords=new HashSet<String>();
+		//In extreme cases answerphrase might not be present in answer sentence
+		//So add resolvedAnswerPhrase explicitly here
+		filterWords.add(resolvedAnswerPhrase);
 		//Filter 1:
 		//converting all words in answerPhrase to lowercase
 		answerSentence=answerSentence.toLowerCase();
