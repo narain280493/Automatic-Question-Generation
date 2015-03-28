@@ -451,6 +451,11 @@ public class QuestionAsker {
 		}
 	}*/
 	public static void main(String [] args) throws ParseException {
+		System.out.println("Args length :"+args.length);
+		System.out.println("Arguments start :");
+		for(String str:args){
+			System.out.println(str);
+		}
 		
 		QuestionTransducer qt = new QuestionTransducer();
 		InitialTransformationStep trans = new InitialTransformationStep();
