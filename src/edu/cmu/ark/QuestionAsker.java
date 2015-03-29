@@ -624,13 +624,13 @@ public class QuestionAsker {
 			String firstWord = null;
 			if(originalString.contains(" ")){
 			   firstWord= originalString.substring(0, originalString.indexOf(" "))+" ";
-			//  System.out.println("Firstword:"+firstWord);
-			  originalString = originalString.replace(firstWord,"");
+			  System.out.println("Removed Firstword:"+firstWord);
+			  originalString = originalString.replace("\\b"+firstWord+"\\b","");
 			
 			}
 			 //Identifying the preposition and eliminating it
 			 tree = StanfordParser.parseTree(originalString);
-			//System.out.println("Removed preposition--->Modified String:"+originalString);
+			System.out.println("Removed preposition--->Modified String:"+originalString);
 			
 				}
 		
