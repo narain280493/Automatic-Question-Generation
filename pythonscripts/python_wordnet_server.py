@@ -7,6 +7,11 @@ def custom500(error):
     response.status=200
     return "NO_RESPONSE"
 
+@error(500)
+def custom500(error):
+    response.status=200
+    return "NO_RESPONSE"
+
 @route('/<choice>/<word>/<sst_tag>')
 def index(choice,word,sst_tag):
 	synsets = []
