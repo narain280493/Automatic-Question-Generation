@@ -1,8 +1,6 @@
 package distractorgeneration;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,9 +12,12 @@ import edu.cmu.ark.PorterStemmer;
 
 public class DistractorFilter {
 	public static List<String> applyFiltersToDistractorList(String resolvedAnswerPhrase,String answerSentence,List<String> distractorList){
-		List<String> removedList=new ArrayList<String>();
-
+		Set<String> removedList=new HashSet<String>();
+		List<String> filteredList=new ArrayList<String>();
 		Set<String> filterWords=new HashSet<String>();
+		//In extreme cases answerphrase might not be present in answer sentence
+		//So add resolvedAnswerPhrase explicitly here
+		filterWords.add(resolvedAnswerPhrase);
 		//Filter 1:
 		//converting all words in answerPhrase to lowercase
 		answerSentence=answerSentence.toLowerCase();
@@ -32,8 +33,8 @@ public class DistractorFilter {
 			maximumDistractorWordCount=Math.max(maximumDistractorWordCount, str.split("\\s+").length);
 		}
 
-		System.out.println("Filter words for answerSentence :"+answerSentence);
-		System.out.println("maximumDistractorWordCount :"+maximumDistractorWordCount);
+	//	System.out.println("Filter words for answerSentence :"+answerSentence);
+		//System.out.println("maximumDistractorWordCount :"+maximumDistractorWordCount);
 		for(int i=0;i<strs.length;i++){
 			String filterWord="";
 			int spaceRequired=0;
@@ -66,6 +67,7 @@ public class DistractorFilter {
 		if(Configuration.INPUT_FILE_NAME==null){
 			System.out.println("Input file name is missing .Making input.txt as input file");
 			Configuration.INPUT_FILE_NAME="input.txt";
+			
 		}
 			String sstOfResolvedAnswerPhrase = SuperSenseTagHelper.getSSTForGivenWord(Configuration.INPUT_FILE_PATH+Configuration.INPUT_FILE_NAME,resolvedAnswerPhrase);
 			Set<String> synonymsOfResolvedAnswerPhrase=new HashSet<String>(WordNetPythonAPI.getResponse("synonym", resolvedAnswerPhrase,sstOfResolvedAnswerPhrase));
@@ -103,7 +105,10 @@ public class DistractorFilter {
 			System.out.println(str);
 		}*/
 		
-		return removedList;
+		for(String str:removedList){
+			filteredList.add(str);
+		}
+		return filteredList;
 	}
 	
 	

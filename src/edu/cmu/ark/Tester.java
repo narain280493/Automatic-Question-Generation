@@ -9,10 +9,9 @@ public class Tester {
 	 public static void main(String[] args) throws ParseException, IOException{
 
 
-		 //QuestionAsker qa = new QuestionAsker();
+		 QuestionAsker qa = new QuestionAsker();
 		//qa.getQuestionsForSentence("My name is Narain.");
-		String arg[]={"--debug","--model", "models/linear-regression-ranker-reg500.ser.gz" ,"--flag"};
-		QuestionAsker.main(arg);
+	
 		// String[] output=new String[50];
 	//	 String output[] =qa.HeadWordResolver("to Narain Sharma and Aditya Suresh Kumar"); //correct
 		//String[] output=qa.HeadWordResolver("John, Vishnu, Adi and Sai");//fails for these type of cases. //need NER to resolve these.
@@ -23,15 +22,13 @@ public class Tester {
 		// String[] output=qa.HeadWordResolver("to Lincolns and Tonys"); //correct
 
 	//	 String[] output=qa.HeadWordResolver("on the village of Ardekul"); //correct
-		 //String[] output=qa.HeadWordResolver("from Narain Sharma and Vishnu Jayvel");
+		 List<String> output=qa.HeadWordResolver("into adulthood ");
 		 
-	/*	 System.out.println("\nPossible HeadWords");
+		 System.out.println("\nPossible HeadWords");
 
 		// String[] output=qa.HeadWordResolver("to excellent men"); //correct
-<<<<<<< HEAD
 
-=======
-		List<String>  output=qa.HeadWordResolver("in Hardin County and Thromas");
+		
 		
 		 System.out.println("\nOutput:");
 		 if(output==null)
@@ -45,7 +42,7 @@ public class Tester {
 		
 		 //	System.out.println(output[4]);
 		
->>>>>>> cc5341cdebbc1818dd78e8cc82650f95e8dcab4b
+
 		
 	// System.out.println(qa.resolveHead("a teacher, counselor, coach, or after-school program director"));
 		 
