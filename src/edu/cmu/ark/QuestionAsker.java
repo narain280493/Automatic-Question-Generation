@@ -618,20 +618,18 @@ public class QuestionAsker {
 		String tag = HeadTree.label().toString();
 		
 		//checking if there are any leading prepositions
-		while(tag.contains("PP")|| tag.contains("ADVP")||tag.contains("DT"))
+		if(tag.contains("PP")|| tag.contains("ADVP")||tag.contains("DT"))
 		{
 			String originalString = TreeUtil.getLabel(HeadTree);
 			String firstWord = null;
 			if(originalString.contains(" ")){
 			   firstWord= originalString.substring(0, originalString.indexOf(" "))+" ";
-			  System.out.println("Firstword:"+firstWord);
+			//  System.out.println("Firstword:"+firstWord);
 			  originalString = originalString.replace(firstWord,"");
-			  tree = StanfordParser.parseTree(originalString);
-			HeadTree = headFinder.determineHead(tree);
-				 tag = HeadTree.label().toString();
+			
 			}
 			 //Identifying the preposition and eliminating it
-			
+			 tree = StanfordParser.parseTree(originalString);
 			//System.out.println("Removed preposition--->Modified String:"+originalString);
 			
 				}

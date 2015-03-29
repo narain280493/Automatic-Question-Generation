@@ -22,7 +22,7 @@ public class Tester {
 		// String[] output=qa.HeadWordResolver("to Lincolns and Tonys"); //correct
 
 	//	 String[] output=qa.HeadWordResolver("on the village of Ardekul"); //correct
-		 List<String> output=qa.HeadWordResolver("into adulthood ");
+		 List<String> output=qa.HeadWordResolver("into the adulthood ");
 		 
 		 System.out.println("\nPossible HeadWords");
 
