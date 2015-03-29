@@ -172,14 +172,21 @@ public class QuestionAsker {
 			}
 		 }
 		List<String> multipleChoices=new ArrayList<String>();
+		
+		multipleChoices.add(originalAnsPhrase);
+		boolean replaceAnsPhraseWithDistractor=false;
+		if(originalAnsPhrase.contains(answerPhrase))
+			replaceAnsPhraseWithDistractor=true;
 		int i=1;
 		for(Distractor distractor:selectedDistractors){
 			if(i==3)
 				break;
-			multipleChoices.add(distractor.distractorWord);
+			if(replaceAnsPhraseWithDistractor)
+				multipleChoices.add(originalAnsPhrase.replace(answerPhrase,distractor.distractorWord));
+			else
+				multipleChoices.add(distractor.distractorWord);
 			i++;
 		}
-		multipleChoices.add(answerPhrase);
 		if(multipleChoices.size()>=3){
 		Collections.shuffle(multipleChoices);
 		System.out.println("****************************************************************************************");

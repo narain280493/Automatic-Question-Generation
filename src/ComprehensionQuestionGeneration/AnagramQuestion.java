@@ -48,7 +48,7 @@ public class AnagramQuestion
             for (int i=0; i<len; i++) 
                 anagram[i]=a.charAt(num[i]);
             
-            return String.valueOf(anagram);   
+            return String.valueOf(anagram).toUpperCase();   
 
         }
 
@@ -89,7 +89,7 @@ public class AnagramQuestion
 			for(int j=0;j<topicList.size()&&i<5;j++,i++){
 				Topic topic=topicList.get(j);
 				System.out.println(getAnagram(topic.topicName));
-				System.out.println("Answer :"+topic.topicName);
+				System.out.println("Answer :"+topic.topicName.toUpperCase());
 			}
 			
         }
