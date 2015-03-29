@@ -1,0 +1,226 @@
+ QuestionCount: 1
+Question:Who fed some to monarchs?
+QuestionCount: 2
+Question:What meant they reduce the disease symptoms in the monarch butterflies?
+****************************************************************************************
+Multiple choices:2)milkweeds	4)doctors	6)guys	
+****************************************************************************************
+QuestionCount: 3
+Question:What did the speaker feed to monarchs?
+QuestionCount: 4
+Question:Did the speaker feed some to monarchs?
+Answer Phrase :Yes
+QuestionCount: 5
+Question:Who did the speaker feed some to?
+****************************************************************************************
+Multiple choices:2)guys	4)doctors	6)monarchs	
+****************************************************************************************
+QuestionCount: 6
+Question:Were different ones different milkweeds?
+Answer Phrase :Yes
+QuestionCount: 7
+Question:Were some of the monarchs sick?
+Answer Phrase :Yes
+QuestionCount: 8
+Question:Who did the speaker feed to monarchs?
+QuestionCount: 9
+Question:Were some of the monarchs healthy?
+Answer Phrase :Yes
+QuestionCount: 10
+Question:What were different milkweeds?
+****************************************************************************************
+Multiple choices:2)and	4)ones	6)and	
+****************************************************************************************
+QuestionCount: 11
+Question:Was the greenhouse different ones?
+Answer Phrase :Yes
+QuestionCount: 12
+Question:Did the speaker do during his job?
+Answer Phrase :Yes
+QuestionCount: 13
+Question:Did some have no disease?
+Answer Phrase :Yes
+QuestionCount: 14
+Question:What had no disease?
+QuestionCount: 15
+Question:Who did during his job?
+QuestionCount: 16
+Question:What was different ones?
+****************************************************************************************
+Multiple choices:2)plant	4)greenhouse	6)products	
+****************************************************************************************
+QuestionCount: 17
+Question:Who did the speaker found mean?
+****************************************************************************************
+Multiple choices:2)to	4)these	6)	
+****************************************************************************************
+QuestionCount: 18
+Question:Were some toxic?
+Answer Phrase :Yes
+QuestionCount: 19
+Question:What were different ones?
+****************************************************************************************
+Multiple choices:2)milkweeds	4)guys	6)doctors	
+****************************************************************************************
+QuestionCount: 20
+Question:What was the greenhouse?
+****************************************************************************************
+Multiple choices:2)and	4)ones	6)and	
+****************************************************************************************
+QuestionCount: 21
+Question:Who had no disease?
+QuestionCount: 22
+Question:Were some not toxic?
+Answer Phrase :Yes
+QuestionCount: 23
+Question:What did some have?
+****************************************************************************************
+Multiple choices:2)need	4)t.b.	6)disease	
+****************************************************************************************
+QuestionCount: 24
+Question:What did the speaker do during?
+****************************************************************************************
+Multiple choices:2)job	4)discovery	6)ways	
+****************************************************************************************
+QuestionCount: 25
+Question:What were toxic?
+QuestionCount: 26
+Question:Who were sick?
+****************************************************************************************
+Multiple choices:2)guys	4)doctors	6)monarchs	
+****************************************************************************************
+QuestionCount: 27
+Question:Who were healthy?
+****************************************************************************************
+Multiple choices:2)monarchs	4)cardenolides	6)predators	
+****************************************************************************************
+QuestionCount: 28
+Question:What was the speaker found?
+****************************************************************************************
+Multiple choices:2)guys	4)milkweeds	6)doctors	
+****************************************************************************************
+QuestionCount: 29
+Question:What were not toxic?
+Reasoning Questions:
+Why did the speaker feed some to monarchs?
+Why were different ones different milkweeds?
+Why were some of the monarchs sick?
+Why were some of the monarchs healthy?
+Why was the greenhouse different ones?
+Why did the speaker do during his job?
+Why did some have no disease?
+Why were some toxic?
+Why were some not toxic?
+ QuestionCount: 1
+Question:Who fed some to monarchs?
+QuestionCount: 2
+Question:What meant they reduce the disease symptoms in the monarch butterflies?
+****************************************************************************************
+Multiple choices:2)guys	4)milkweeds	6)doctors	
+****************************************************************************************
+QuestionCount: 3
+Question:What did the speaker feed to monarchs?
+QuestionCount: 4
+Question:Did the speaker feed some to monarchs?
+Answer Phrase :Yes
+QuestionCount: 5
+Question:Who did the speaker feed some to?
+****************************************************************************************
+Multiple choices:2)guys	4)monarchs	6)doctors	
+****************************************************************************************
+QuestionCount: 6
+Question:Were different ones different milkweeds?
+Answer Phrase :Yes
+QuestionCount: 7
+Question:Were some of the monarchs sick?
+Answer Phrase :Yes
+QuestionCount: 8
+Question:Who did the speaker feed to monarchs?
+QuestionCount: 9
+Question:Were some of the monarchs healthy?
+Answer Phrase :Yes
+QuestionCount: 10
+Question:What were different milkweeds?
+****************************************************************************************
+Multiple choices:2)and	4)ones	6)and	
+****************************************************************************************
+QuestionCount: 11
+Question:Was the greenhouse different ones?
+Answer Phrase :Yes
+QuestionCount: 12
+Question:Did the speaker do during his job?
+Answer Phrase :Yes
+QuestionCount: 13
+Question:Did some have no disease?
+Answer Phrase :Yes
+QuestionCount: 14
+Question:What had no disease?
+QuestionCount: 15
+Question:Who did during his job?
+QuestionCount: 16
+Question:What was different ones?
+****************************************************************************************
+Multiple choices:2)products	4)plant	6)greenhouse	
+****************************************************************************************
+QuestionCount: 17
+Question:Who did the speaker found mean?
+****************************************************************************************
+Multiple choices:2)	4)to	6)these	
+****************************************************************************************
+QuestionCount: 18
+Question:Were some toxic?
+Answer Phrase :Yes
+QuestionCount: 19
+Question:What were different ones?
+****************************************************************************************
+Multiple choices:2)guys	4)doctors	6)milkweeds	
+****************************************************************************************
+QuestionCount: 20
+Question:What was the greenhouse?
+****************************************************************************************
+Multiple choices:2)and	4)ones	6)and	
+****************************************************************************************
+QuestionCount: 21
+Question:Who had no disease?
+QuestionCount: 22
+Question:Were some not toxic?
+Answer Phrase :Yes
+QuestionCount: 23
+Question:What did some have?
+****************************************************************************************
+Multiple choices:2)need	4)t.b.	6)disease	
+****************************************************************************************
+QuestionCount: 24
+Question:What did the speaker do during?
+****************************************************************************************
+Multiple choices:2)job	4)discovery	6)ways	
+****************************************************************************************
+QuestionCount: 25
+Question:What were toxic?
+QuestionCount: 26
+Question:Who were sick?
+****************************************************************************************
+Multiple choices:2)guys	4)monarchs	6)doctors	
+****************************************************************************************
+QuestionCount: 27
+Question:Who were healthy?
+****************************************************************************************
+Multiple choices:2)monarchs	4)cardenolides	6)predators	
+****************************************************************************************
+QuestionCount: 28
+Question:What was the speaker found?
+****************************************************************************************
+Multiple choices:2)doctors	4)milkweeds	6)guys	
+****************************************************************************************
+QuestionCount: 29
+Question:What were not toxic?
+Reasoning Questions:
+Why did the speaker feed some to monarchs?
+Why were different ones different milkweeds?
+Why were some of the monarchs sick?
+Why were some of the monarchs healthy?
+Why was the greenhouse different ones?
+Why did the speaker do during his job?
+Why did some have no disease?
+Why were some toxic?
+Why were some not toxic?

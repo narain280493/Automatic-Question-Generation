@@ -10,39 +10,40 @@ import java.util.List;
 import edu.cmu.ark.QuestionAsker;
 import edu.stanford.nlp.trees.tregex.ParseException;
 public class VideoClipper {
-	public static ArrayList<String> ClipVideo()
+	public static void ClipVideo()
 	{
-		ArrayList<String> paragraph =new ArrayList<String>();
+	//	ArrayList<String> paragraph =new ArrayList<String>();
+		
 		try {
 			Process p = Runtime.getRuntime().exec("python"+" "+Configuration.SUMMARY_PYTHON_SCRIPT_PATH);
 			BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			String summaryPara = new String();
+		//	String summaryPara = new String();
 			String start_time =new String();
 			String end_time =new String();
 			String clippingStatus=new String();
 			start_time=in.readLine();
 			end_time=in.readLine();
-			 while((summaryPara = in.readLine())!=null){
-				 	paragraph.add(summaryPara);
-				 //	System.out.println(summaryPara);
+			 while((clippingStatus = in.readLine())!=null){
+				 	System.out.println(clippingStatus);
+				 	
 			 }
 			 System.out.println("Start time:"+start_time);
 			 System.out.println("End time:"+end_time);
 			 
-			 p=Runtime.getRuntime().exec("python"+" "+Configuration.VIDEO_CROPPER_SCRIPT_PATH+" "+start_time+" "+end_time);
+		/*	 p=Runtime.getRuntime().exec("python"+" "+Configuration.VIDEO_CROPPER_SCRIPT_PATH+" "+start_time+" "+end_time);
 			BufferedReader inn=new BufferedReader(new InputStreamReader(p.getInputStream()));
 			 while((clippingStatus = inn.readLine())!=null){
 				 	System.out.println(clippingStatus);
 				 	
 			 }
-			 return paragraph;
+			*/
 		} 
 		
 		catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return null;
+		
 	}
 	public static void main(String [] args) throws ParseException
 	{

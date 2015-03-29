@@ -72,11 +72,8 @@ public class TranscriptCrawler {
 		ArrayList<String> summaryPara =new ArrayList<String>();
 		getTranscript("http://www.ted.com/talks/jaap_de_roode_how_butterflies_self_medicate/transcript?language=en");
 		VideoClipper vc=new VideoClipper();
-		summaryPara=vc.ClipVideo();
-		for(String sentence:summaryPara)
-		{
-			System.out.println(sentence);
-		}
+		vc.ClipVideo();
+		
 	//	VideoPlayer vp =new VideoPlayer();
 		//vp.play();
 	}

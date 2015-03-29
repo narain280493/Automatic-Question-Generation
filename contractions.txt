@@ -1,0 +1,127 @@
+ain't-am not
+Ain't-Am not
+aren't-are not
+Aren't-Are not
+can't-can not
+Can't-Can not
+don't-do not
+Don't-Do not
+Could've-Could have
+could've-could have
+couldn't-could not
+Couldn't-Could not
+couldn't've-could not have
+Couldn't've-Could not have
+didn't-did not
+Didn't-Did not
+doesn't-does not
+Doesn't-Does not
+hadn't-has not
+Hadn't-Has not
+hadn't've-had not have
+Hadn't've-Had not have
+Hasn't-Has not
+hasn't-has not
+haven't-have not
+Haven't-Have not
+he'd've-he would have
+He'd've-He would have
+how'll-how will
+How'll-How will
+I'm-I am
+I've-I have
+I'd've-I would have
+isn't-is not
+Isn't-Is not
+it'd've-it would have
+It'd've-It would have
+let's-let us
+Let's-Let us
+Ma'am-Madam
+ma'am-madam
+might've-might have
+Might've-Might have
+mightn't-might not
+Mightn't-Might not
+mightn't've-might not have
+Mightn't've-Might not have
+must've-must have
+Must've-Must have
+mustn't-must not
+Mustn't-Must not
+needn't-need not
+Needn't-Need not
+not've-not have
+Not've-Not have
+o'clock-of the clock
+O'clock-of the clock
+oughtn't-ought not
+Oughtn't-Ought not
+shan't-shall not
+Shan't-Shall not
+she'd've-she would have
+She'd've-She would have
+should've-should have
+Should've-Should have
+shouldn't-should not
+Shouldn't-Should not
+shouldn't've-should not have
+shouldn't've-Should not have
+that'll-that will
+That'll-That will
+there're-there are
+There're-There are
+there'd've-there would have
+There'd've-There would have
+they're-they are
+They're-They are
+they've-they have
+they'd've-they would have
+They've-They have
+They'd've-They would have
+wasn't-was not
+Wasn't-Was not
+we're-we are
+We're-We are
+we've-we have
+We've-We have
+we'll-we will
+We'll-We will
+we'd've-we would have
+We'd've-We would have
+weren't-were not
+Weren't-Were not
+what're-what are
+What're-What are
+what've-what have
+What've-What have
+where'd-where did
+Where'd-Where did
+where've-where have
+Where've-Where have
+who're-who are
+Who're-Who are
+who've-who have
+Who've-Who have
+who'd've-who would have
+Who'd've-Who would have
+why're-why are
+Why're-Why are
+why'll-why will
+Why'll-Why will
+won't-will not
+Won't-Will not
+would've-would have
+Would've-Would have
+wouldn't-would not
+Wouldn't-Would not
+wouldn't've-would not have
+Wouldn't've-Would not have
+Y'all-You all
+y'all-you all
+you're-you are
+You're-You are
+You've-You have
+you've-you have
+You'd've-You would have
+you'd've-you would have

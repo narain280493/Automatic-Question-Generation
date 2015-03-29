@@ -1,0 +1,10 @@
+I:the speaker
+my:his
+is:was
+are:were
+am:is
+ourselves:themselves
+we:People
+our:their
+you:people
+me:him

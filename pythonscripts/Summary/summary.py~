@@ -183,7 +183,7 @@ def main():
 
     st = SummaryTool()
 
-    filepath = """bullying.txt"""
+    filepath = """bullying"""
     content = st.readFile(filepath)
     fo = open("bullying_summary.txt","wb")
 
