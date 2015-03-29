@@ -140,10 +140,10 @@ public class QuestionAsker {
 		
 		}
 		if(distractorCount<2){
-			System.out.println("POS distractors before applying filters");
-			for(String str:posDistractorList){
-				System.out.println(str);
-			}
+		//	System.out.println("POS distractors before applying filters");
+			//for(String str:posDistractorList){
+				//System.out.println(str);
+			//}
 			 posDistractorList=DistractorFilter.applyFiltersToDistractorList(answerPhrase,answerSentence, posDistractorList);
 			 posDistractorList=DistractorFilter.removeSSTDistractorsFromPOSDistractorList(posDistractorList,sstDistractorList);
 			//stage 2 POSTagger

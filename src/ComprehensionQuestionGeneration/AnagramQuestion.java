@@ -11,6 +11,7 @@ import java.*;
 import Configuration.Configuration;
 import TopicExtraction.Topic;
 import TopicExtraction.WikipediaMinerAPI;
+import Utility.MiscellaneousHelper;
 /**
  *
  * @author aditya
@@ -23,6 +24,8 @@ public class AnagramQuestion
 		
 	}
         static String getAnagram(String a){
+        	//making all uppercase
+        	a.toUpperCase();
         	int len=a.length();
             Random rand=new Random();
             int j=0;
@@ -63,17 +66,22 @@ public class AnagramQuestion
     	}
 		static void anagramMaker()
         {	
-			if(Configuration.INPUT_TEXT==null){
-				System.out.println("Input text is null.Enter input text");
+				System.out.println("Enter input filename");
 				Scanner in=new Scanner(System.in);
 				//Read a string from the user
-				System.out.print("Input:"); 
-				Configuration.INPUT_TEXT = in.nextLine();
+				Configuration.INPUT_FILE_NAME = in.nextLine();
+				String inputString="";
 				
-			}
+				try {
+					inputString=MiscellaneousHelper.readFile(Configuration.INPUT_FILE_PATH+Configuration.INPUT_FILE_NAME);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				System.out.println("Text :"+inputString);
 			
 			
-			List<Topic> topicList=WikipediaMinerAPI.getTopics(Configuration.INPUT_TEXT);
+			List<Topic> topicList=WikipediaMinerAPI.getTopics(inputString);
 			int i=0;
 			System.out.println();
 			System.err.println("Rearrange the letters to find important keywords from the passage");
