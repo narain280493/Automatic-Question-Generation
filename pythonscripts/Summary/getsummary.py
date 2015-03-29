@@ -3,6 +3,7 @@ import json
 import nltk.data
 from summary import *
 from regex import *
+from VideoCropper import *
 
 timestamp = []
 paragraph = []
@@ -11,8 +12,8 @@ content = " "
 
 count =0
 inputText =" "
-f= open("/home/narain/workspace/questiongeneration/summarycontent.txt","wb")
-g= open("/home/narain/workspace/questiongeneration/transcripttext.txt","wb")
+summaryFile= open("/home/narain/workspace/questiongeneration/summary.txt","wb")
+transcriptFile= open("/home/narain/workspace/questiongeneration/transcript.txt","wb")
 with open("/home/narain/workspace/questiongeneration/transcript.json") as json_file:
     json_data = json.load(json_file)
    
@@ -28,7 +29,8 @@ content = contractions(content)
 #print "After expanding contractions:\n",content
 content = regex(content)
 #print "After processing: \n",content
-g.write(content)
+transcriptFile.write(content)
+transcriptFile.close()
 st = SummaryTool()
 sentences_dic = st.get_senteces_ranks(content)
 summary = st.get_distractors(content,sentences_dic,1)
@@ -47,7 +49,7 @@ for p in paragraph:
         break
 #print "paragraph:",inputText
 inputText = firstToThirdPerson(inputText)
-
+#print inputText
 outputList = []
 tokenizer = nltk.data.load('tokenizers/punkt/english.pickle')
 sentences = tokenizer.tokenize(inputText)
@@ -59,8 +61,12 @@ for sentence in sentences:
    #     print "Less than 55"
         outputList.append(sentence)
 for sentence in outputList:
-	f.write(sentence)
-	#print sentence
+#   f.write(sentence)
+    print sentence
 
+content= '\n'.join(outputList)
+summaryFile.write(content)
+summaryFile.close()
+cropVideo(start_time,end_time)
 
 

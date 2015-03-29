@@ -1,0 +1,18 @@
+QuestionCount: 1
+Question:Who was born to Thomas and Nancy Lincoln?
+QuestionCount: 2
+Question:Who was Abraham Lincoln born to?
+QuestionCount: 3
+Question:Was Abraham Lincoln born to Thomas and Nancy Lincoln?
+Answer Phrase :Yes
+Reasoning Questions:
+Why was Abraham Lincoln born to Thomas and Nancy Lincoln?
+ QuestionCount: 1
+Question:Who was born to Thomas and Nancy Lincoln?
+2)sinking spring	4)hodgenville	6)Abraham Lincoln	QuestionCount: 2
+Question:Who was Abraham Lincoln born to?
+2)hardin county	4)hodgenville	6)Thomas	QuestionCount: 3
+Question:Was Abraham Lincoln born to Thomas and Nancy Lincoln?
+Answer Phrase :Yes
+Reasoning Questions:
+Why was Abraham Lincoln born to Thomas and Nancy Lincoln?

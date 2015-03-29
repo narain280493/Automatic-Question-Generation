@@ -74,9 +74,15 @@ public class QuestionAsker {
 	public static String INPUT_FILE_NAME;
 	public static QuestionRanker qr = null;
 	
-	public QuestionAsker(){
+	
+	
+	public QuestionAsker() throws IOException{
+		
+		
 		try {
 			StanfordParser.initialize();
+			
+			
 		} catch (Exception e) {
 			System.out.println("Stanford Parser-Error:"+e.toString());
 			//MsgPrinter.printErrorMsg("Could not create Stanford parser."+e.toString());
@@ -85,10 +91,8 @@ public class QuestionAsker {
 	}
 	
 	
-	public static void generateDistractor(String fileName,String originalAnsPhrase,String answerPhrase,String answerSentence) throws IOException{
-		File file=new File(Configuration.QUESTION_DISTRACTOR_LOG_PATH);
-		FileWriter fw = new FileWriter(file.getAbsoluteFile());
-		BufferedWriter bw = new BufferedWriter(fw);
+	public static void generateDistractor(String fileName,String originalAnsPhrase,String answerPhrase,String answerSentence, FileWriter fw) throws IOException{
+
 		int distractorCount=0;
 		System.out.println("Distractor generation starts:");
 		//NOTE: call POS Tagger before SST because POS Tagger will group all adjacent proper noun together
@@ -176,15 +180,20 @@ public class QuestionAsker {
 		multipleChoices.add(answerPhrase);
 		if(multipleChoices.size()>=3){
 		Collections.shuffle(multipleChoices);
+		fw.write("****************************************************************************************"+"\n");
 		System.out.println("****************************************************************************************");
 		
 		System.out.println("Multiple choices:");
+		fw.write("Multiple choices:");
 		int choiceNumber=1;
 		for(String choice:multipleChoices){
 			System.out.print(choiceNumber+++")"+choice+"\t");
+			fw.write(choiceNumber++ +")"+ choice + "\t");
 		}
 		System.out.println();
+		fw.write("\n");
 		System.out.println("****************************************************************************************");
+		fw.write("****************************************************************************************"+"\n");
 		}
 		
 	}
@@ -336,19 +345,27 @@ public class QuestionAsker {
 	 * @param args
 	 * @return 
 	 * @throws ParseException 
+	 * @throws IOException 
 	 */
-		public static void main(String [] args) throws ParseException {
-		
+
+		public static void main(String [] args) throws ParseException, IOException {
+
+	
 		QuestionTransducer qt = new QuestionTransducer();
 		InitialTransformationStep trans = new InitialTransformationStep();
+		File file = new File(Configuration.QUESTION_DISTRACTOR_LOG_PATH);
+		  if(!file.exists()) {
+              file.createNewFile();
+          }
+		FileWriter fw = new FileWriter(file,true);
 		
-		
+		fw.write(" ");
 		qt.setAvoidPronounsAndDemonstratives(false);
 		
 		//pre-load
 		AnalysisUtilities.getInstance();
 		FileReader in=null;
-		File file=new File(Configuration.QUESTION_DISTRACTOR_LOG_PATH);
+	
 		String buf;
 		Tree parsed;
 		boolean printVerbose = true;//setting printVerbose true always
@@ -365,26 +382,21 @@ public class QuestionAsker {
 		boolean justWH = false;
 		boolean videoFlag=false;
 		
-		if (!file.exists()) {
-			try {
-				file.createNewFile();
-			} catch (IOException e) {
-				
-				System.out.println("Exception:"+e);
-			}
-		}
+		
 
 		for(int i=0;i<args.length;i++){
 			if(args[i].equals("--flag"))
 			{
 				System.out.println("Video Question Generation");
 				videoFlag=true;
+			//	System.exit(1);
 			}
 			if(args[i].equals("--debug")){
 				GlobalProperties.setDebug(true);
 			}else if(args[i].equals("--verbose")){
 				printVerbose = true;
 			}else if(args[i].equals("--model")){ //ranking model path
+				System.out.println("Model Path is:"+args[i+1]);
 				modelPath = args[i+1]; 
 				i++;
 			}else if(args[i].equals("--keep-pro")){
@@ -478,8 +490,7 @@ public class QuestionAsker {
 					break;
 				}
 				Configuration.INPUT_TEXT=doc;
-				FileWriter fw = new FileWriter(file.getAbsoluteFile());
-				BufferedWriter bw = new BufferedWriter(fw);
+				
 				System.out.println("Saving input text in Configuration.INPUT_TEXT variable");
 				long startTime = System.currentTimeMillis();
 				List<String> sentences = AnalysisUtilities.getSentences(doc);
@@ -545,10 +556,10 @@ public class QuestionAsker {
 					System.out.println("=====================================================================================================");
 					System.out.println();
 					System.out.println("QuestionCount: "+questionCount);
-					bw.write("QuestionCount: "+questionCount+"\n");
+					fw.write("QuestionCount: "+questionCount+"\n");
 					questionCount++;
 					System.out.println("Question :"+question.yield());
-					bw.write("Question:"+question.yield()+"\n");
+					fw.write("Question:"+question.yield()+"\n");
 					System.out.println("Score :"+question.getScore());
 					//Date distractor generation code begins
 				//	if(question.yield().substring(0,4).equalsIgnoreCase("When")){
@@ -568,8 +579,8 @@ public class QuestionAsker {
 						else{
 							System.out.println("Date distractors cannot be created.Moving over to SST and POS distractor generation method");
 						}
-						*/
-				//	}
+						
+				//	}*/
 					//Date distractor generation code ends 
 					//if ansTree is null, there is no answer phrase.So don't call distractor generator
 					
@@ -610,12 +621,12 @@ public class QuestionAsker {
 
 						String ansSentence =  AnalysisUtilities.getCleanedUpYield(question.getSourceTree());
 						System.out.println("Answer Sentence :"+ansSentence);
-						generateDistractor(INPUT_FILE_NAME, originalAnsPhrase, ansPhrase, ansSentence);
+						generateDistractor(INPUT_FILE_NAME, originalAnsPhrase, ansPhrase, ansSentence,fw);
 						
 					}
 					else{
 						System.out.println("Answer Phrase :"+"Yes");
-						bw.write("Answer Phrase :"+"Yes"+"\n");
+						fw.write("Answer Phrase :"+"Yes"+"\n");
 						String ansSentence =  AnalysisUtilities.getCleanedUpYield(question.getSourceTree());
 						System.out.println("Answer Sentence :"+ansSentence);
 						String questionSentence=question.yield();
@@ -628,24 +639,28 @@ public class QuestionAsker {
 					
 				}
 				System.out.println("Reasoning questions: ");
-				bw.write("Reasoning Questions:\n");
+				fw.write("Reasoning Questions:\n");
 				for(String reasoningQuestion:reasoningQuestionList){
 					System.out.println(reasoningQuestion);
-					bw.write(reasoningQuestion+"\n");
+					fw.write(reasoningQuestion+"\n");
 				}
-				
+
 	
 			}//child while block ends
+			
 			}
-
+				if(videoFlag)
+					break;
 			//	VocabularyQuestion.populateTagMap();
 			}//parent while block ends
 		}//try block ends
 		catch(Exception e){
 			e.printStackTrace();
 		}
+		fw.close();
 	}
 
+	
 	public static void printFeatureNames(){
 		List<String> featureNames = Question.getFeatureNames();
 		for(int i=0;i<featureNames.size();i++){

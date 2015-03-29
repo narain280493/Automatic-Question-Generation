@@ -1,16 +1,17 @@
 package edu.cmu.ark;
 
+import java.io.IOException;
 import java.util.List;
 
 import edu.stanford.nlp.trees.tregex.ParseException;
 
 public class Tester {
-	 public static void main(String[] args) throws ParseException{
+	 public static void main(String[] args) throws ParseException, IOException{
 
 
-		 QuestionAsker qa = new QuestionAsker();
+		 //QuestionAsker qa = new QuestionAsker();
 		//qa.getQuestionsForSentence("My name is Narain.");
-		String arg[]={"--debug","--model models/linear-regression-ranker-reg500.ser.g" ,"--flag"};
+		String arg[]={"--debug","--model", "models/linear-regression-ranker-reg500.ser.gz" ,"--flag"};
 		QuestionAsker.main(arg);
 		// String[] output=new String[50];
 	//	 String output[] =qa.HeadWordResolver("to Narain Sharma and Aditya Suresh Kumar"); //correct
@@ -27,7 +28,24 @@ public class Tester {
 	/*	 System.out.println("\nPossible HeadWords");
 
 		// String[] output=qa.HeadWordResolver("to excellent men"); //correct
+<<<<<<< HEAD
 
+=======
+		List<String>  output=qa.HeadWordResolver("in Hardin County and Thromas");
+		
+		 System.out.println("\nOutput:");
+		 if(output==null)
+			 System.out.println("No response");
+		 else{
+			 for (String word: output) {
+				 	if(word!=null)
+		            System.out.println(word);
+		        }
+		}
+		
+		 //	System.out.println(output[4]);
+		
+>>>>>>> cc5341cdebbc1818dd78e8cc82650f95e8dcab4b
 		
 	// System.out.println(qa.resolveHead("a teacher, counselor, coach, or after-school program director"));
 		 

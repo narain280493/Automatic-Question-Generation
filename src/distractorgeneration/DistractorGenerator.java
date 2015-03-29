@@ -57,7 +57,12 @@ public static List<List<String>> getNgrams(String[] wordList,String distractor,i
 	   
 }
 public static List<Distractor> rankDistractor(String sentence,String ans,List<String> distractors){
-	String[] wordList=sentence.split(" ");
+	//bug
+	//remove dots at the end of the string alone and not from floating point numbers like "7.12"
+	sentence=sentence.replaceAll("\\.(?!\\d)","");
+	//remove all punctuation marks
+	sentence=sentence.replaceAll("[!?,]", "");
+	String[] wordList=sentence.split("\\s+");
 	int N;
 	int index=0;
 	for(String word:wordList){

@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import Configuration.Configuration;
 
 
 public class VideoPlayer {
@@ -14,7 +15,7 @@ public class VideoPlayer {
 			HtmlWriter hw= new HtmlWriter();
 			hw.writeHtml();
 		
-			String htmlFilePath = "/home/narain/workspace/questiongeneration/video.html";
+			String htmlFilePath =Configuration.HTML_FILE_PATH;
 			File htmlFile = new File(htmlFilePath);
 	        Desktop.getDesktop().browse(htmlFile.toURI());
 	        
