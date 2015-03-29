@@ -21,12 +21,7 @@
 //	  mheilman@cmu.edu
 //	  http://www.cs.cmu.edu/~mheilman
 
-
-
 package edu.cmu.ark;
-
-
-
 
 ///import info.ephyra.nlp.StanfordParser;
 //import info.ephyra.nlp.TreeUtil;
