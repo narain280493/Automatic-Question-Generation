@@ -70,9 +70,11 @@ public class TranscriptCrawler {
 
 	public static void main(String[] args) {
 		ArrayList<String> summaryPara =new ArrayList<String>();
-		getTranscript("http://www.ted.com/talks/jaap_de_roode_how_butterflies_self_medicate/transcript?language=en");
-		VideoClipper vc=new VideoClipper();
-		vc.ClipVideo();
+	//	getTranscript("http://www.ted.com/talks/annette_heuser_the_3_agencies_with_the_power_to_make_or_break_economies/transcript?language=en");
+		getTranscript("http://www.ted.com/talks/jason_pontin_can_technology_solve_our_big_problems/transcript?language=en");
+	//	getTranscript("http://www.ted.com/talks/ron_gutman_the_hidden_power_of_smiling/transcript?language=en");
+	//	VideoClipper vc=new VideoClipper();
+	//	vc.ClipVideo();
 		
 	//	VideoPlayer vp =new VideoPlayer();
 		//vp.play();

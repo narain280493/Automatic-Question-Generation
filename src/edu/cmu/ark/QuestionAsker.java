@@ -254,7 +254,7 @@ public class QuestionAsker {
 		for(int i=0;i<args.length;i++){
 			if(args[i].equals("--flag"))
 			{
-				System.out.println("Video Question Generation");
+				//System.out.println("Video Question Generation");
 				videoFlag=true;
 			//	System.exit(1);
 			}

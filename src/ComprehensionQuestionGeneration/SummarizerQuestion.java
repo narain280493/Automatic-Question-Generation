@@ -2,6 +2,7 @@ package ComprehensionQuestionGeneration;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
@@ -19,7 +20,10 @@ public class SummarizerQuestion {
 			 
 			Process p = Runtime.getRuntime().exec("python "+Configuration.SUMMARIZER_PYTHON_SCRIPT_PATH+" "+inputFilePath);
 			try{
-			FileReader inputFile = new FileReader(Configuration.SUMMARIZER_OUTPUT_FILE_PATH);
+				File file =new File(Configuration.SUMMARIZER_OUTPUT_FILE_PATH);
+				if(!file.exists())
+					System.out.println("File not found");
+			FileReader inputFile = new FileReader(file);
 			BufferedReader bufferReader = new BufferedReader(inputFile);
 			 String line;
 			  while ((line = bufferReader.readLine()) != null)   {
@@ -38,7 +42,7 @@ public class SummarizerQuestion {
 	}
 	public static void main(String[] args) {
 
-		generateSummarizerQuestion("/home/narain/workspace/questiongeneration/input3.txt");
+		generateSummarizerQuestion("/home/narain/workspace/questiongeneration/bullying.txt");
 
 	}
 

@@ -248,11 +248,10 @@ def main():
            # print question
             fo.write("\n")
             #print "\n"
-           # for sentence in p:
-                
-            fo.write(sentence)
+            for sentence in p:
+                fo.write(sentence)
             #    print sentence
-            fo.write("\n ---------- \n")
+                fo.write("\n ---------- \n")
              #   print "----------\n"
         fo.close()
                 
